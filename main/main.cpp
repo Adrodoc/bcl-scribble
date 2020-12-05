@@ -1,6 +1,5 @@
-#include <iostream>
-#include <mpi.h>
 #include <bcl/bcl.hpp>
+#include <iostream>
 
 using namespace std;
 
