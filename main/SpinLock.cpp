@@ -19,7 +19,6 @@ public:
     }
     void release()
     {
-        int zero = 0;
-        BCL::write(&zero, flag, 1);
+        BCL::fetch_and_op(flag, 0, BCL::replace<int>());
     }
 };
