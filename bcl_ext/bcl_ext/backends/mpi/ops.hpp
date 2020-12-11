@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bcl/bcl.hpp>
+#include <bcl/backends/mpi/ops.hpp>
 
 namespace BCL
 {

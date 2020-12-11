@@ -1,5 +1,4 @@
-#include <bcl/bcl.hpp>
-#include <mpi_ops.hpp>
+#include <bcl_ext/bcl.hpp>
 
 class SpinLock
 {
@@ -11,10 +10,7 @@ public:
     ~SpinLock() {}
     void acquire()
     {
-        int rank = BCL::rank();
-        int nprocs = BCL::nprocs();
         while (BCL::fetch_and_op(flag, 1, BCL::replace<int>()))
-            // std::cout << "(" << rank << "/" << nprocs << "): waiting to acquire lock" << std::endl
             ;
     }
     void release()

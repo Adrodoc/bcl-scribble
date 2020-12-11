@@ -16,4 +16,8 @@ target_link_libraries(bcl INTERFACE MPI::MPI_CXX)
 
 
 
+add_subdirectory(bcl_ext)
+
+
+
 add_subdirectory(main)
