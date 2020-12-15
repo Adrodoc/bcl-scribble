@@ -8,14 +8,7 @@ int main(int argc, char *argv[])
 {
   BCL::init();
 
-  BCL::GlobalPtr<int> ptr;
-  if (BCL::rank() == 0)
-  {
-    ptr = BCL::alloc<int>(1);
-    *ptr = 0;
-  }
-  ptr = BCL::broadcast(ptr, 0);
-  SpinLock lock{ptr};
+  SpinLock lock{};
 
   lock.acquire();
   int rank = BCL::rank();

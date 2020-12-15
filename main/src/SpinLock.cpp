@@ -6,7 +6,15 @@ private:
     BCL::GlobalPtr<int> flag;
 
 public:
-    SpinLock(BCL::GlobalPtr<int> flag) : flag{flag} {}
+    SpinLock(const uint64_t rank = 0)
+    {
+        if (BCL::rank() == rank)
+        {
+            flag = BCL::alloc<int>(1);
+            *flag = 0;
+        }
+        flag = BCL::broadcast(flag, rank);
+    }
     ~SpinLock() {}
     void acquire()
     {
