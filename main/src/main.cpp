@@ -1,6 +1,6 @@
 #include <bcl/bcl.hpp>
 #include <iomanip>
-#include <SpinLock.cpp>
+#include <SpinLock2.cpp>
 
 std::string formatted_time();
 
@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 
   std::cout << "Size: " << sizeof(BCL::GlobalPtr<int>) << std::endl;
 
-  SpinLock lock;
+  SpinLock2 lock;
 
   lock.acquire();
   int rank = BCL::rank();
