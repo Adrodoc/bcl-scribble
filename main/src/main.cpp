@@ -8,7 +8,9 @@ int main(int argc, char *argv[])
 {
   BCL::init();
 
-  SpinLock lock{};
+  std::cout << "Size: " << sizeof(BCL::GlobalPtr<int>) << std::endl;
+
+  SpinLock lock;
 
   lock.acquire();
   int rank = BCL::rank();
