@@ -1,14 +1,11 @@
 cmake_minimum_required(VERSION 3.16)
-include(FetchContent)
 
 project(scribble)
 
 
 
-FetchContent_Declare(bcl GIT_REPOSITORY https://github.com/berkeley-container-library/bcl.git)
-FetchContent_MakeAvailable(bcl)
 add_library(bcl INTERFACE)
-target_include_directories(bcl INTERFACE ${bcl_SOURCE_DIR})
+target_include_directories(bcl INTERFACE bcl)
 
 find_package(MPI REQUIRED)
 message(STATUS "Run: ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${MPIEXEC_PREFLAGS} EXECUTABLE ${MPIEXEC_POSTFLAGS} ARGS")
