@@ -63,33 +63,34 @@ public:
     {
         log() << "entering acquire()" << std::endl;
         log() << "my_node=" << my_node << std::endl;
-        auto predesessor = BCL::fetch_and_op(tail, my_node, BCL::replace<BCL::GlobalPtr<mcs_node>>());
-        log() << "predesessor=" << predesessor << std::endl;
-        auto predesessor_next = BCL::struct_field<BCL::GlobalPtr<mcs_node>>(predesessor, offsetof(mcs_node, next));
+        auto predecessor = BCL::fetch_and_op(tail, my_node, BCL::replace<BCL::GlobalPtr<mcs_node>>());
+        log() << "predecessor=" << predecessor << std::endl;
 
-        if (predesessor != nullptr)
+        if (predecessor != nullptr)
         {
             auto my_node_locked = BCL::struct_field<bool>(my_node, offsetof(mcs_node, locked));
             log() << "locking my_node at " << my_node << std::endl;
             BCL::atomic_rput(true, my_node_locked);
             //     my_node.local()->locked = true;
 
-            log() << "notifying predecessor at " << predesessor_next << std::endl;
+            auto predecessor_next = BCL::struct_field<BCL::GlobalPtr<mcs_node>>(predecessor, offsetof(mcs_node, next));
+            log() << "notifying predecessor at " << predecessor_next << std::endl;
+
             MPI_Accumulate(&my_node, 1, MPI_UINT64_T,
-                           predesessor_next.rank, predesessor_next.ptr, 1, MPI_UINT64_T,
+                           predecessor_next.rank, predecessor_next.ptr, 1, MPI_UINT64_T,
                            MPI_REPLACE, BCL::win);
             // log() << "after MPI_Accumulate" << std::endl;
-            MPI_Win_flush_local(predesessor_next.rank, BCL::win);
+            MPI_Win_flush_local(predecessor_next.rank, BCL::win);
             // log() << "after MPI_Win_local_all" << std::endl;
 
             // MPI_Request request;
             // MPI_Raccumulate(&my_node, 1, MPI_UINT64_T,
-            //                 predesessor_next.rank, predesessor_next.ptr, 1, MPI_UINT64_T,
+            //                 predecessor_next.rank, predecessor_next.ptr, 1, MPI_UINT64_T,
             //                 MPI_REPLACE, BCL::win, &request);
             // MPI_Wait(&request, MPI_STATUS_IGNORE);
 
-            // BCL::atomic_rput(my_node, predesessor_next);
-            //     predesessor->next = my_node;
+            // BCL::atomic_rput(my_node, predecessor_next);
+            //     predecessor->next = my_node;
 
             log() << "notified predecessor" << std::endl;
 
