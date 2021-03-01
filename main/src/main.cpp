@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
   int rank = BCL::rank();
   int nprocs = BCL::nprocs();
   log() << "lock acquired" << std::endl;
-  sleep(1);
+  // sleep(1);
   log() << "releasing lock" << std::endl;
   lock.release();
 
