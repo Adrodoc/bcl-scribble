@@ -2,6 +2,7 @@
 
 #include <bcl/bcl.hpp>
 #include <iomanip>
+#include <iostream>
 
 std::string formatted_time()
 {
