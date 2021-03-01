@@ -7,4 +7,15 @@
 `cmake --build build`
 
 ## Run
-`OMPI_MCA_osc=pt2pt mpirun -n 4 build/main/main` (see https://github.com/open-mpi/ompi/issues/2080)
+### Locally
+```bash
+export OMPI_MCA_osc=pt2pt # See https://github.com/open-mpi/ompi/issues/2080
+mpirun -n 3 build/main/main
+```
+
+### At LRZ
+```bash
+salloc --ntasks=3 --partition=cm2_inter
+mpiexec build/main/main
+exit
+```
