@@ -76,18 +76,20 @@ public:
             auto predecessor_next = BCL::struct_field<BCL::GlobalPtr<mcs_node>>(predecessor, offsetof(mcs_node, next));
             log() << "notifying predecessor at " << predecessor_next << std::endl;
 
-            MPI_Accumulate(&my_node, 1, MPI_UINT64_T,
-                           predecessor_next.rank, predecessor_next.ptr, 1, MPI_UINT64_T,
-                           MPI_REPLACE, BCL::win);
+            // MPI_Accumulate(&my_node, 1, MPI_UINT64_T,
+            //                predecessor_next.rank, predecessor_next.ptr, 1, MPI_UINT64_T,
+            //                MPI_REPLACE, BCL::win);
             // log() << "after MPI_Accumulate" << std::endl;
-            MPI_Win_flush_local(predecessor_next.rank, BCL::win);
+            // MPI_Win_flush_local(predecessor_next.rank, BCL::win);
             // log() << "after MPI_Win_local_all" << std::endl;
 
-            // MPI_Request request;
-            // MPI_Raccumulate(&my_node, 1, MPI_UINT64_T,
-            //                 predecessor_next.rank, predecessor_next.ptr, 1, MPI_UINT64_T,
-            //                 MPI_REPLACE, BCL::win, &request);
-            // MPI_Wait(&request, MPI_STATUS_IGNORE);
+            MPI_Request request;
+            MPI_Raccumulate(&my_node, 1, MPI_UINT64_T,
+                            predecessor_next.rank, predecessor_next.ptr, 1, MPI_UINT64_T,
+                            MPI_REPLACE, BCL::win, &request);
+            log() << "after MPI_Raccumulate" << std::endl;
+            MPI_Wait(&request, MPI_STATUS_IGNORE);
+            log() << "after MPI_Wait" << std::endl;
 
             // BCL::atomic_rput(my_node, predecessor_next);
             //     predecessor->next = my_node;
