@@ -98,8 +98,8 @@ public:
 
             while (BCL::atomic_rget(my_node_locked))
                 // MPI_Win_flush_local_all(BCL::win);
-                MPI_Win_sync(BCL::win);
-            ;
+                // MPI_Win_sync(BCL::win);
+                ;
             //     while (my_node.local()->locked)
             //         ;
         }
