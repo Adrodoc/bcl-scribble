@@ -7,4 +7,4 @@
 `cmake --build build`
 
 ## Run
-`mpirun -n 4 build/main/main`
+`OMPI_MCA_osc=pt2pt mpirun -n 4 build/main/main` (see https://github.com/open-mpi/ompi/issues/2080)
