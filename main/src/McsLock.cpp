@@ -56,7 +56,7 @@ public:
         // {
         //     BCL::dealloc(tail);
         // }
-        // BCL::dealloc(my_node);
+        BCL::dealloc(my_node);
     }
 
     void acquire()
