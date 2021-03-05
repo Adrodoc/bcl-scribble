@@ -9,7 +9,7 @@
 ## Run
 ### Locally
 ```bash
-export OMPI_MCA_osc=pt2pt # See https://github.com/open-mpi/ompi/issues/2080
+export OMPI_MCA_osc=pt2pt # Only needed when using Open-MPI, see https://github.com/open-mpi/ompi/issues/2080
 mpirun -n 3 build/main/main
 ```
 
