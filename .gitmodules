@@ -1,4 +1,4 @@
-[submodule "bcl"]
+[submodule "extern/bcl"]
 	path = extern/bcl
 	url = https://github.com/Adrodoc/bcl.git
 [submodule "extern/benchmark"]
