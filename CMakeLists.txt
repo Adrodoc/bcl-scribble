@@ -20,7 +20,7 @@ endif()
 
 
 add_library(bcl INTERFACE)
-target_include_directories(bcl INTERFACE bcl)
+target_include_directories(bcl INTERFACE extern/bcl)
 
 find_package(MPI REQUIRED)
 message(STATUS "Run: ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${MPIEXEC_PREFLAGS} EXECUTABLE ${MPIEXEC_POSTFLAGS} ARGS")
@@ -29,6 +29,11 @@ target_link_libraries(bcl INTERFACE MPI::MPI_CXX)
 
 
 add_subdirectory(bcl_ext)
+
+
+
+set(BENCHMARK_ENABLE_GTEST_TESTS OFF)
+add_subdirectory(extern/benchmark)
 
 
 

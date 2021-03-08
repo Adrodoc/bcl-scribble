@@ -1,3 +1,5 @@
-add_executable(main src/main.cpp)
+# add_executable(main src/main.cpp)
+add_executable(main src/benchmark/main.cpp)
 target_include_directories(main PUBLIC src)
 target_link_libraries(main bcl_ext)
+target_link_libraries(main benchmark::benchmark)
