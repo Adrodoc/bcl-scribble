@@ -94,9 +94,9 @@ public:
         auto successor = BCL::atomic_rget(my_node_next);
         // auto successor = my_node.local()->next;
         log() << "successor=" << successor << std::endl;
+        auto null = BCL::null<mcs_node>();
         if (successor == nullptr)
         {
-            auto null = BCL::null<mcs_node>();
             auto cas = BCL::compare_and_swap(tail, my_node, null);
             log() << "cas(" << tail << ", " << my_node << ", " << null << ") = " << cas << std::endl;
             if (cas == my_node)
@@ -118,7 +118,7 @@ public:
         auto successor_locked = BCL::struct_field<bool>(successor, offsetof(mcs_node, locked));
         BCL::atomic_rput(false, successor_locked);
         // successor->locked = false;
-
+        BCL::atomic_rput(null, my_node_next);
         log() << "lock released" << std::endl;
     }
 };
