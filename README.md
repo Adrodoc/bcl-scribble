@@ -1,7 +1,7 @@
 # Setup
 * Clone this repo: `git clone`
 * Go into the clone: `cd bcl-scribble`
-* Setup cmake: `cmake -S . -B build`
+* Setup cmake: `cmake -DCMAKE_BUILD_TYPE=Release -S . -B build`
 
 ## Compile
 `cmake --build build`
