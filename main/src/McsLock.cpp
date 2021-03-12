@@ -1,4 +1,5 @@
 #include <bcl_ext/bcl.hpp>
+#include "Lock.cpp"
 #include "log.cpp"
 
 namespace BCL
@@ -22,15 +23,17 @@ struct mcs_node
     bool locked;
 };
 
-class McsLock
+class McsLock : public Lock
 {
 private:
     BCL::GlobalPtr<BCL::GlobalPtr<mcs_node>> tail;
     BCL::GlobalPtr<mcs_node> my_node;
 
 public:
+    McsLock(const McsLock &) = delete;
     McsLock(uint64_t rank = 0)
     {
+        // log() << "entering McsLock" << std::endl;
         if (BCL::rank() == rank)
         {
             tail = BCL::alloc<BCL::GlobalPtr<mcs_node>>(1);
@@ -47,16 +50,19 @@ public:
 
         // log() << "tail=" << tail << std::endl;
         // log() << "my_node=" << my_node << std::endl;
+        // log() << "exiting McsLock" << std::endl;
     }
 
     ~McsLock()
     {
+        // log() << "entering ~McsLock" << std::endl;
         // TODO dealloc
         // if (tail.is_local())
         // {
         //     BCL::dealloc(tail);
         // }
         BCL::dealloc(my_node);
+        // log() << "exiting ~McsLock" << std::endl;
     }
 
     void acquire()
@@ -82,6 +88,7 @@ public:
             // log() << "notified predecessor" << std::endl;
 
             while (BCL::atomic_rget(my_node_locked))
+                // log() << "waiting to acquire lock" << std::endl;
                 ;
             //     while (my_node.local()->locked)
             //         ;
@@ -113,7 +120,7 @@ public:
         {
             successor = BCL::atomic_rget(my_node_next);
             //     successor = my_node.local()->next;
-            // log() << "while successor=" << successor << std::endl;
+            // log() << "waiting for successor at " << my_node_next << std::endl;
         }
         // log() << "found successor=" << successor << std::endl;
 

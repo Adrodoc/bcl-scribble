@@ -1,6 +1,7 @@
 #include <bcl_ext/bcl.hpp>
+#include "Lock.cpp"
 
-class SpinLock
+class SpinLock : public Lock
 {
 private:
     BCL::GlobalPtr<int> flag;
