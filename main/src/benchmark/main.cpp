@@ -33,12 +33,15 @@ std::chrono::duration<double> ecsb(benchmark::State &state, L &lock)
 template <class L>
 std::chrono::duration<double> sob(benchmark::State &state, L &lock)
 {
+  std::random_device rd;                      // non-deterministic generator
+  std::mt19937 gen(rd());                     // to seed mersenne twister.
+  std::uniform_int_distribution<> dist(1, 4); // distribute results between 1 and 4 inclusive.
   auto counter = BCL::alloc_shared<int>(1);
   auto start = std::chrono::high_resolution_clock::now();
   for (size_t i = 0; i < state.range(); i++)
   {
     lock.acquire();
-    BCL::rput((int)i, counter);
+    BCL::rput(dist(gen), counter);
     lock.release();
   }
   auto end = std::chrono::high_resolution_clock::now();
