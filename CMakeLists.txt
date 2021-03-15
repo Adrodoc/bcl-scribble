@@ -32,7 +32,7 @@ add_subdirectory(bcl_ext)
 
 
 
-set(BENCHMARK_ENABLE_GTEST_TESTS OFF)
+set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "Enable building the unit tests which depend on gtest")
 add_subdirectory(extern/benchmark)
 
 
