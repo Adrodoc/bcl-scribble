@@ -12,7 +12,7 @@
  * no workload in the CS.
  */
 template <class L>
-std::chrono::high_resolution_clock::time_point ecsb(benchmark::State &state, L &lock)
+std::chrono::duration<double> ecsb(benchmark::State &state, L &lock)
 {
   auto start = std::chrono::high_resolution_clock::now();
   for (size_t i = 0; i < state.range(); i++)
@@ -20,7 +20,28 @@ std::chrono::high_resolution_clock::time_point ecsb(benchmark::State &state, L &
     lock.acquire();
     lock.release();
   }
-  return start;
+  auto end = std::chrono::high_resolution_clock::now();
+  return end - start;
+}
+
+/*
+ * The single-operation benchmark (SOB) measures the throughput of acquiring a lock with only one
+ * single operation (one memory access) in the CS; it represents irregular parallel work-loads such
+ * as graph processing with vertices protected by fine locks.
+ */
+template <class L>
+std::chrono::duration<double> sob(benchmark::State &state, L &lock)
+{
+  auto counter = BCL::alloc_shared<int>(1);
+  auto start = std::chrono::high_resolution_clock::now();
+  for (size_t i = 0; i < state.range(); i++)
+  {
+    lock.acquire();
+    BCL::rput((int)i, counter);
+    lock.release();
+  }
+  auto end = std::chrono::high_resolution_clock::now();
+  return end - start;
 }
 
 void print_processor()
@@ -42,10 +63,16 @@ int main(int argc, char *argv[])
 
   benchmark::RegisterBenchmark("ecsb/McsLock", mpi_lock_benchmark<McsLock>, ecsb<McsLock>)
       ->UseManualTime()
-      ->Range(64, 1 << 15);
+      ->Arg(1 << 10);
   benchmark::RegisterBenchmark("ecsb/SpinLock", mpi_lock_benchmark<SpinLock>, ecsb<SpinLock>)
       ->UseManualTime()
-      ->Range(64, 1 << 15);
+      ->Arg(1 << 10);
+  benchmark::RegisterBenchmark("sob/McsLock", mpi_lock_benchmark<McsLock>, sob<McsLock>)
+      ->UseManualTime()
+      ->Arg(1 << 10);
+  benchmark::RegisterBenchmark("sob/SpinLock", mpi_lock_benchmark<SpinLock>, sob<SpinLock>)
+      ->UseManualTime()
+      ->Arg(1 << 10);
 
   benchmark::Initialize(&argc, argv);
   if (BCL::rank() == 0)

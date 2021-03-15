@@ -59,6 +59,11 @@ namespace BCL
     {
     };
 
+    template <>
+    struct no_op<int> : public abstract_no_op<int>, public abstract_int, public atomic_op<int>
+    {
+    };
+
     template <typename T>
     struct no_op<GlobalPtr<T>> : public abstract_no_op<GlobalPtr<T>>, public abstract_gptr<T>, public atomic_op<GlobalPtr<T>>
     {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bcl/bcl.hpp>
+#include <bcl_ext/core/alloc.hpp>
 
 #ifdef SHMEM
 #include <bcl_ext/backends/shmem/backend.hpp>
