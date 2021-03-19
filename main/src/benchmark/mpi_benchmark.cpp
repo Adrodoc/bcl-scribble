@@ -33,4 +33,5 @@ void mpi_lock_benchmark_with_supplier(
     int64_t critical_sections = state.iterations() * state.range() * size;
     using Counter = benchmark::Counter;
     state.counters["critical_sections"] = Counter(critical_sections, Counter::kIsRate);
+    state.SetLabel("{\"mpi_processes\":" + std::to_string(size) + "}");
 }
