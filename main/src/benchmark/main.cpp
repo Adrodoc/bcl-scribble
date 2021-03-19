@@ -1,6 +1,5 @@
 #include <bcl/bcl.hpp>
 #include <benchmark/benchmark.h>
-#include <functional>
 #include <random>
 #include "Lock.cpp"
 #include "McsLock.cpp"
@@ -121,28 +120,28 @@ int main(int argc, char *argv[])
 
   benchmark::RegisterBenchmark("ecsb/McsLock", mpi_lock_benchmark<McsLock>, ecsb<McsLock>)
       ->UseManualTime()
-      ->Arg(1 << 10);
+      ->Arg(1 << 8);
   benchmark::RegisterBenchmark("ecsb/SpinLock", mpi_lock_benchmark<SpinLock>, ecsb<SpinLock>)
       ->UseManualTime()
-      ->Arg(1 << 10);
+      ->Arg(1 << 8);
   benchmark::RegisterBenchmark("sob/McsLock", mpi_lock_benchmark<McsLock>, sob<McsLock>)
       ->UseManualTime()
-      ->Arg(1 << 10);
+      ->Arg(1 << 8);
   benchmark::RegisterBenchmark("sob/SpinLock", mpi_lock_benchmark<SpinLock>, sob<SpinLock>)
       ->UseManualTime()
-      ->Arg(1 << 10);
+      ->Arg(1 << 8);
   benchmark::RegisterBenchmark("wcsb/McsLock", mpi_lock_benchmark<McsLock>, wcsb<McsLock>)
       ->UseManualTime()
-      ->Arg(1 << 10);
+      ->Arg(1 << 8);
   benchmark::RegisterBenchmark("wcsb/SpinLock", mpi_lock_benchmark<SpinLock>, wcsb<SpinLock>)
       ->UseManualTime()
-      ->Arg(1 << 10);
+      ->Arg(1 << 8);
   benchmark::RegisterBenchmark("warb/McsLock", mpi_lock_benchmark<McsLock>, warb<McsLock>)
       ->UseManualTime()
-      ->Arg(1 << 10);
+      ->Arg(1 << 8);
   benchmark::RegisterBenchmark("warb/SpinLock", mpi_lock_benchmark<SpinLock>, warb<SpinLock>)
       ->UseManualTime()
-      ->Arg(1 << 10);
+      ->Arg(1 << 8);
 
   benchmark::Initialize(&argc, argv);
   if (BCL::rank() == 0)
