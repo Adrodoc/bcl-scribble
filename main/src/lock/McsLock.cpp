@@ -1,3 +1,5 @@
+#pragma once
+
 #include <bcl_ext/bcl.hpp>
 #include "Lock.cpp"
 #include "log.cpp"
@@ -16,7 +18,7 @@ private:
 
 public:
     McsLock(const McsLock &) = delete;
-    McsLock(uint64_t rank = 0)
+    McsLock(const uint64_t rank = 0)
     {
         // log() << "entering McsLock" << std::endl;
         if (BCL::rank() == rank)
@@ -50,6 +52,11 @@ public:
 
     void acquire()
     {
+        acquire_ext();
+    }
+    // Returns true if we acquired the lock immediately, because were the first one in the queue right away.
+    bool acquire_ext()
+    {
         auto my_node_next = BCL::struct_field<BCL::GlobalPtr<mcs_node>>(my_node, offsetof(mcs_node, next));
         BCL::atomic_rput(BCL::null<mcs_node>(), my_node_next);
         // log() << "entering acquire()" << std::endl;
@@ -57,7 +64,8 @@ public:
         auto predecessor = BCL::fetch_and_op(tail, my_node, BCL::replace<BCL::GlobalPtr<mcs_node>>());
         // log() << "predecessor=" << predecessor << std::endl;
 
-        if (predecessor != nullptr)
+        bool first = predecessor == nullptr;
+        if (!first)
         {
             auto my_node_locked = BCL::struct_field<bool>(my_node, offsetof(mcs_node, locked));
             // log() << "locking my_node at " << my_node << std::endl;
@@ -79,9 +87,15 @@ public:
             //         ;
         }
         // log() << "lock acquired" << std::endl;
+        return first;
     }
 
     void release()
+    {
+        release_ext();
+    }
+    // Returns true if we were the last one in the queue. By now someone might have entered the queue again though.
+    bool release_ext()
     {
         // log() << "entering release()" << std::endl;
         auto my_node_next = BCL::struct_field<BCL::GlobalPtr<mcs_node>>(my_node, offsetof(mcs_node, next));
@@ -97,7 +111,7 @@ public:
             {
                 // log() << "no successor" << std::endl;
                 // log() << "lock released" << std::endl;
-                return;
+                return true;
             }
             // log() << "waiting for successor at " << my_node_next << std::endl;
         }
@@ -113,5 +127,6 @@ public:
         BCL::atomic_rput(false, successor_locked);
         // successor->locked = false;
         // log() << "lock released" << std::endl;
+        return false;
     }
 };

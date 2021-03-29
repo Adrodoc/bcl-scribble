@@ -1,3 +1,5 @@
+#pragma once
+
 #include <bcl_ext/bcl.hpp>
 #include "Lock.cpp"
 

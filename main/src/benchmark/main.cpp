@@ -1,5 +1,6 @@
 #include "NullReporter.cpp"
 #include "benchmarks.cpp"
+#include "lock/HybridLock.cpp"
 #include "lock/Lock.cpp"
 #include "lock/McsLock.cpp"
 #include "lock/TasLock.cpp"
@@ -22,6 +23,7 @@ int main(int argc, char *argv[])
   print_processor();
   MPI_Barrier(MPI_COMM_WORLD);
 
+  REGISTER_LOCK_BENCHMARKS(HybridLock);
   REGISTER_LOCK_BENCHMARKS(McsLock);
   REGISTER_LOCK_BENCHMARKS(TasLock);
   REGISTER_LOCK_BENCHMARKS(TtsLock);

@@ -24,6 +24,36 @@ namespace BCL
         }
     };
 
+    // Define the bor operation
+    template <typename T>
+    struct abstract_bor : public virtual abstract_op<T>
+    {
+        MPI_Op op() const { return MPI_BOR; }
+    };
+
+    template <typename T>
+    struct bor;
+
+    template <>
+    struct bor<uint8_t> : public abstract_bor<uint8_t>, public abstract_uint8_t, public atomic_op<uint8_t>
+    {
+    };
+
+    // Define the band operation
+    template <typename T>
+    struct abstract_band : public virtual abstract_op<T>
+    {
+        MPI_Op op() const { return MPI_BAND; }
+    };
+
+    template <typename T>
+    struct band;
+
+    template <>
+    struct band<uint8_t> : public abstract_band<uint8_t>, public abstract_uint8_t, public atomic_op<uint8_t>
+    {
+    };
+
     // Define the replace operation
     template <typename T>
     struct abstract_replace : public virtual abstract_op<T>
