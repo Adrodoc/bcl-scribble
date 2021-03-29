@@ -2,21 +2,6 @@
 #include "Lock.cpp"
 #include "log.cpp"
 
-namespace BCL
-{
-    template <typename T>
-    GlobalPtr<T> null()
-    {
-        return nullptr;
-    }
-
-    template <typename F, typename S>
-    GlobalPtr<F> struct_field(GlobalPtr<S> gptr, uint32_t offset)
-    {
-        return {gptr.rank, gptr.ptr + offset};
-    }
-} // namespace BCL
-
 struct mcs_node
 {
     BCL::GlobalPtr<mcs_node> next;
@@ -42,8 +27,6 @@ public:
         tail = BCL::broadcast(tail, rank);
 
         my_node = BCL::alloc<mcs_node>(1);
-        auto my_node_next = BCL::struct_field<BCL::GlobalPtr<mcs_node>>(my_node, offsetof(mcs_node, next));
-        BCL::atomic_rput(BCL::null<mcs_node>(), my_node_next);
         // my_node.local()->next = BCL::GlobalPtr<mcs_node>(nullptr);
         // mcs_node n = {BCL::GlobalPtr<mcs_node>(nullptr), false};
         // BCL::write(&n, my_node, 1);
@@ -56,17 +39,19 @@ public:
     ~McsLock()
     {
         // log() << "entering ~McsLock" << std::endl;
-        // TODO dealloc
-        // if (tail.is_local())
-        // {
-        //     BCL::dealloc(tail);
-        // }
+        BCL::barrier();
+        if (tail.is_local())
+        {
+            BCL::dealloc(tail);
+        }
         BCL::dealloc(my_node);
         // log() << "exiting ~McsLock" << std::endl;
     }
 
     void acquire()
     {
+        auto my_node_next = BCL::struct_field<BCL::GlobalPtr<mcs_node>>(my_node, offsetof(mcs_node, next));
+        BCL::atomic_rput(BCL::null<mcs_node>(), my_node_next);
         // log() << "entering acquire()" << std::endl;
         // log() << "my_node=" << my_node << std::endl;
         auto predecessor = BCL::fetch_and_op(tail, my_node, BCL::replace<BCL::GlobalPtr<mcs_node>>());
@@ -103,9 +88,9 @@ public:
         auto successor = BCL::atomic_rget(my_node_next);
         // auto successor = my_node.local()->next;
         // log() << "successor=" << successor << std::endl;
-        auto null = BCL::null<mcs_node>();
         if (successor == nullptr)
         {
+            auto null = BCL::null<mcs_node>();
             auto cas = BCL::compare_and_swap(tail, my_node, null);
             // log() << "cas(" << tail << ", " << my_node << ", " << null << ") = " << cas << std::endl;
             if (cas == my_node)
@@ -127,7 +112,6 @@ public:
         auto successor_locked = BCL::struct_field<bool>(successor, offsetof(mcs_node, locked));
         BCL::atomic_rput(false, successor_locked);
         // successor->locked = false;
-        BCL::atomic_rput(null, my_node_next);
         // log() << "lock released" << std::endl;
     }
 };

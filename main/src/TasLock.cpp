@@ -1,29 +1,36 @@
 #include <bcl_ext/bcl.hpp>
 #include "Lock.cpp"
 
-class SpinLock : public Lock
+class TasLock : public Lock
 {
 private:
-    BCL::GlobalPtr<int> flag;
+    BCL::GlobalPtr<uint8_t> flag;
 
 public:
-    SpinLock(const uint64_t rank = 0)
+    TasLock(const uint64_t rank = 0)
     {
         if (BCL::rank() == rank)
         {
-            flag = BCL::alloc<int>(1);
+            flag = BCL::alloc<uint8_t>(1);
             *flag = 0;
         }
         flag = BCL::broadcast(flag, rank);
     }
-    ~SpinLock() {}
+    ~TasLock()
+    {
+        BCL::barrier();
+        if (flag.is_local())
+        {
+            BCL::dealloc(flag);
+        }
+    }
     void acquire()
     {
-        while (BCL::fetch_and_op(flag, 1, BCL::replace<int>()))
+        while (BCL::fetch_and_op(flag, (uint8_t)1, BCL::replace<uint8_t>()))
             ;
     }
     void release()
     {
-        BCL::fetch_and_op(flag, 0, BCL::replace<int>());
+        BCL::fetch_and_op(flag, (uint8_t)0, BCL::replace<uint8_t>());
     }
 };

@@ -10,6 +10,11 @@ namespace BCL
         MPI_Datatype type() const { return MPI_CXX_BOOL; }
     };
 
+    struct abstract_uint8_t : public virtual abstract_op<uint8_t>
+    {
+        MPI_Datatype type() const { return MPI_UINT8_T; }
+    };
+
     template <typename T>
     struct abstract_gptr : public virtual abstract_op<GlobalPtr<T>>
     {
@@ -39,6 +44,11 @@ namespace BCL
     {
     };
 
+    template <>
+    struct replace<uint8_t> : public abstract_replace<uint8_t>, public abstract_uint8_t, public atomic_op<uint8_t>
+    {
+    };
+
     template <typename T>
     struct replace<GlobalPtr<T>> : public abstract_replace<GlobalPtr<T>>, public abstract_gptr<T>, public atomic_op<GlobalPtr<T>>
     {
@@ -61,6 +71,11 @@ namespace BCL
 
     template <>
     struct no_op<int> : public abstract_no_op<int>, public abstract_int, public atomic_op<int>
+    {
+    };
+
+    template <>
+    struct no_op<uint8_t> : public abstract_no_op<uint8_t>, public abstract_uint8_t, public atomic_op<uint8_t>
     {
     };
 

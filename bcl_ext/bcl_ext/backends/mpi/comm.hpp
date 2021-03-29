@@ -17,4 +17,16 @@ namespace BCL
         T src;
         return fetch_and_op(dst, src, no_op<T>());
     }
+
+    template <typename T>
+    GlobalPtr<T> null()
+    {
+        return nullptr;
+    }
+
+    template <typename F, typename S>
+    GlobalPtr<F> struct_field(GlobalPtr<S> gptr, uint32_t offset)
+    {
+        return {gptr.rank, gptr.ptr + offset};
+    }
 } // namespace BCL
