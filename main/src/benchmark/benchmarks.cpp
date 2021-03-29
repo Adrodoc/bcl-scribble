@@ -1,4 +1,4 @@
-#include <bcl/bcl.hpp>
+#include <bcl_ext/bcl.hpp>
 #include <random>
 #include "mpi_benchmark.cpp"
 

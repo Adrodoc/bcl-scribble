@@ -1,9 +1,9 @@
-#include "Lock.cpp"
-#include "McsLock.cpp"
 #include "NullReporter.cpp"
-#include "TasLock.cpp"
-#include "TtsLock.cpp"
 #include "benchmarks.cpp"
+#include "lock/Lock.cpp"
+#include "lock/McsLock.cpp"
+#include "lock/TasLock.cpp"
+#include "lock/TtsLock.cpp"
 
 void print_processor()
 {

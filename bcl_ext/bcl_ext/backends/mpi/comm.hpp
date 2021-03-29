@@ -6,9 +6,27 @@
 namespace BCL
 {
     template <typename T>
+    inline void op(const GlobalPtr<T> &ptr, const T &val, const atomic_op<T> &op)
+    {
+        MPI_Request request;
+        int error_code = MPI_Raccumulate(&val, 1, op.type(),
+                                         ptr.rank, ptr.ptr, 1, op.type(),
+                                         op.op(), BCL::win, &request);
+        BCL_DEBUG(
+            if (error_code != MPI_SUCCESS) {
+                throw debug_error("BCL fetch_and_op(): MPI_Rget_accumulate return error code " + std::to_string(error_code));
+            })
+        error_code = MPI_Wait(&request, MPI_STATUS_IGNORE);
+        BCL_DEBUG(
+            if (error_code != MPI_SUCCESS) {
+                throw debug_error("BCL fetch_and_op(): MPI_Rget_accumulate (MPI_Wait) return error code " + std::to_string(error_code));
+            })
+    }
+
+    template <typename T>
     inline void atomic_rput(const T &src, const GlobalPtr<T> &dst)
     {
-        fetch_and_op(dst, src, replace<T>());
+        op(dst, src, replace<T>());
     }
 
     template <typename T>
