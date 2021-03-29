@@ -111,6 +111,22 @@ void print_processor()
             << processor_name << std::endl;
 }
 
+template <class L>
+void registerLockBenchmark(const std::string name, std::function<std::chrono::duration<double>(benchmark::State &, L &)> benchmark)
+{
+  benchmark::RegisterBenchmark(name.c_str(), mpi_lock_benchmark<L>, benchmark)
+      ->UseManualTime()
+      ->Arg(1 << 8);
+}
+
+#define REGISTER_LOCK_BENCHMARK(b, L) registerLockBenchmark<L>(#b + std::string("/") + #L, b<L>);
+
+#define REGISTER_LOCK_BENCHMARKS(L) \
+  REGISTER_LOCK_BENCHMARK(ecsb, L); \
+  REGISTER_LOCK_BENCHMARK(sob, L);  \
+  REGISTER_LOCK_BENCHMARK(wcsb, L); \
+  REGISTER_LOCK_BENCHMARK(warb, L);
+
 int main(int argc, char *argv[])
 {
   BCL::init();
@@ -118,30 +134,8 @@ int main(int argc, char *argv[])
   print_processor();
   MPI_Barrier(MPI_COMM_WORLD);
 
-  benchmark::RegisterBenchmark("ecsb/McsLock", mpi_lock_benchmark<McsLock>, ecsb<McsLock>)
-      ->UseManualTime()
-      ->Arg(1 << 8);
-  benchmark::RegisterBenchmark("ecsb/SpinLock", mpi_lock_benchmark<SpinLock>, ecsb<SpinLock>)
-      ->UseManualTime()
-      ->Arg(1 << 8);
-  benchmark::RegisterBenchmark("sob/McsLock", mpi_lock_benchmark<McsLock>, sob<McsLock>)
-      ->UseManualTime()
-      ->Arg(1 << 8);
-  benchmark::RegisterBenchmark("sob/SpinLock", mpi_lock_benchmark<SpinLock>, sob<SpinLock>)
-      ->UseManualTime()
-      ->Arg(1 << 8);
-  benchmark::RegisterBenchmark("wcsb/McsLock", mpi_lock_benchmark<McsLock>, wcsb<McsLock>)
-      ->UseManualTime()
-      ->Arg(1 << 8);
-  benchmark::RegisterBenchmark("wcsb/SpinLock", mpi_lock_benchmark<SpinLock>, wcsb<SpinLock>)
-      ->UseManualTime()
-      ->Arg(1 << 8);
-  benchmark::RegisterBenchmark("warb/McsLock", mpi_lock_benchmark<McsLock>, warb<McsLock>)
-      ->UseManualTime()
-      ->Arg(1 << 8);
-  benchmark::RegisterBenchmark("warb/SpinLock", mpi_lock_benchmark<SpinLock>, warb<SpinLock>)
-      ->UseManualTime()
-      ->Arg(1 << 8);
+  REGISTER_LOCK_BENCHMARKS(McsLock);
+  REGISTER_LOCK_BENCHMARKS(SpinLock);
 
   benchmark::Initialize(&argc, argv);
   if (BCL::rank() == 0)
