@@ -37,13 +37,13 @@ namespace BCL
     }
 
     template <typename T>
-    GlobalPtr<T> null()
+    inline GlobalPtr<T> null()
     {
         return nullptr;
     }
 
     template <typename F, typename S>
-    GlobalPtr<F> struct_field(GlobalPtr<S> gptr, uint32_t offset)
+    inline GlobalPtr<F> struct_field(GlobalPtr<S> gptr, uint32_t offset)
     {
         return {gptr.rank, gptr.ptr + offset};
     }

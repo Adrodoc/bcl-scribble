@@ -4,15 +4,14 @@
 #include "Lock.cpp"
 #include "log.cpp"
 
-struct mcs_node
-{
-    BCL::GlobalPtr<mcs_node> next;
-    bool locked;
-};
-
 class McsLock : public Lock
 {
 private:
+    struct mcs_node
+    {
+        BCL::GlobalPtr<mcs_node> next;
+        bool locked;
+    };
     BCL::GlobalPtr<BCL::GlobalPtr<mcs_node>> tail;
     BCL::GlobalPtr<mcs_node> my_node;
 
