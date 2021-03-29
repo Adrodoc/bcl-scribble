@@ -3,8 +3,8 @@
 #include "mpi_benchmark.cpp"
 
 /*
- * The empty-critical-sectionbenchmark (ECSB) derives the throughput of acquiring an empty lock with
- * no workload in the CS.
+ * The empty-critical-section benchmark (ECSB) derives the throughput of acquiring an empty lock
+ * with no workload in the CS.
  */
 template <class L>
 std::chrono::duration<double> ecsb(benchmark::State &state, L &lock)

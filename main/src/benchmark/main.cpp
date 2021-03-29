@@ -1,12 +1,12 @@
 #include "NullReporter.cpp"
 #include "benchmarks.cpp"
+// #include "lock/DisableableTtsLock.cpp"
 #include "lock/HybridLock.cpp"
-#include "lock/Lock.cpp"
 #include "lock/McsLock.cpp"
 // #include "lock/McsLockMpiFlushLocal.cpp"
 // #include "lock/McsLockMpiFlushLocalAll.cpp"
 // #include "lock/McsLockMpiRequest.cpp"
-#include "lock/TasLock.cpp"
+// #include "lock/TasLock.cpp"
 #include "lock/TtsLock.cpp"
 
 void print_processor()
@@ -26,12 +26,13 @@ int main(int argc, char *argv[])
   print_processor();
   MPI_Barrier(MPI_COMM_WORLD);
 
+  // REGISTER_LOCK_BENCHMARKS(DisableableTtsLock);
   REGISTER_LOCK_BENCHMARKS(HybridLock);
   REGISTER_LOCK_BENCHMARKS(McsLock);
   // REGISTER_LOCK_BENCHMARKS(McsLockMpiFlushLocal);
   // REGISTER_LOCK_BENCHMARKS(McsLockMpiFlushLocalAll);
   // REGISTER_LOCK_BENCHMARKS(McsLockMpiRequest);
-  REGISTER_LOCK_BENCHMARKS(TasLock);
+  // REGISTER_LOCK_BENCHMARKS(TasLock);
   REGISTER_LOCK_BENCHMARKS(TtsLock);
 
   benchmark::Initialize(&argc, argv);
