@@ -1,5 +1,6 @@
 from pathlib import Path
 import json
+import numpy as np
 import pandas as pd
 import seaborn as sns
 
@@ -32,12 +33,14 @@ for commit_path in reports_dir.iterdir():
 
         plot = sns.lineplot(
             data=df,
+            estimator=np.median,
             x='mpi_processes', y='critical_sections',
-            hue='lock', style='lock', markers=True, dashes=False
+            hue='lock', style='lock', markers=True, dashes=False,
         )
         plot.set(
+            # yscale='log',
             ylabel='median throughput in million locks/s\nwith 95% confidence interval',
-            xticks=df['mpi_processes'].drop_duplicates()
+            xticks=df['mpi_processes'].drop_duplicates(),
         )
 
         fig = plot.get_figure()
