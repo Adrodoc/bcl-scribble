@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
   else
   {
     NullReporter null;
-    benchmark::RunSpecifiedBenchmarks(&null);
+    benchmark::RunSpecifiedBenchmarks(&null, &null);
   }
   BCL::finalize();
   return 0;
