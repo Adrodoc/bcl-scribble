@@ -71,6 +71,9 @@ public:
             BCL::atomic_rput(true, my_node_locked);
             //     my_node.local()->locked = true;
 
+            log() << "flushing" << std::endl;
+            BCL::flush();
+
             auto predecessor_next = BCL::struct_field<BCL::GlobalPtr<mcs_node>>(predecessor, offsetof(mcs_node, next));
             log() << "notifying predecessor at " << predecessor_next << std::endl;
 
