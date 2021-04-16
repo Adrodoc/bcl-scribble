@@ -130,6 +130,7 @@ public:
         }
         while (successor == nullptr)
         {
+            BCL::flush();
             successor = BCL::atomic_rget(my_node_next);
             //     successor = my_node.local()->next;
             // log() << "waiting for successor at " << my_node_next << std::endl;
