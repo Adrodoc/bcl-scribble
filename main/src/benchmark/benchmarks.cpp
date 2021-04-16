@@ -27,9 +27,9 @@ std::chrono::duration<double> ecsb(benchmark::State &state, L &lock)
 template <class L>
 std::chrono::duration<double> sob(benchmark::State &state, L &lock)
 {
-    std::random_device rd;                      // non-deterministic generator
-    std::mt19937 gen(rd());                     // to seed mersenne twister.
-    std::uniform_int_distribution<> dist(1, 4); // distribute results between 1 and 4 inclusive.
+    std::random_device rd;                            // non-deterministic generator
+    std::mt19937 gen(rd());                           // to seed mersenne twister.
+    std::uniform_int_distribution<> dist(1000, 4000); // distribute between 1000 and 4000 inclusive.
     auto counter = BCL::alloc_shared<int>(1);
     auto start = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < state.range(); i++)
@@ -50,9 +50,9 @@ std::chrono::duration<double> sob(benchmark::State &state, L &lock)
 template <class L>
 std::chrono::duration<double> wcsb(benchmark::State &state, L &lock)
 {
-    std::random_device rd;                      // non-deterministic generator
-    std::mt19937 gen(rd());                     // to seed mersenne twister.
-    std::uniform_int_distribution<> dist(1, 4); // distribute results between 1 and 4 inclusive.
+    std::random_device rd;                            // non-deterministic generator
+    std::mt19937 gen(rd());                           // to seed mersenne twister.
+    std::uniform_int_distribution<> dist(1000, 4000); // distribute between 1000 and 4000 inclusive.
     auto counter = BCL::alloc_shared<int>(1);
     auto start = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < state.range(); i++)
@@ -61,7 +61,7 @@ std::chrono::duration<double> wcsb(benchmark::State &state, L &lock)
         int c = BCL::rget(counter) + 1;
         BCL::rput(c, counter);
         auto started_spinning = std::chrono::high_resolution_clock::now();
-        std::chrono::microseconds time_to_wait{dist(gen)};
+        std::chrono::nanoseconds time_to_wait{dist(gen)};
         auto spin_until = started_spinning + time_to_wait;
         while (std::chrono::high_resolution_clock::now() < spin_until)
             ;
@@ -78,16 +78,16 @@ std::chrono::duration<double> wcsb(benchmark::State &state, L &lock)
 template <class L>
 std::chrono::duration<double> warb(benchmark::State &state, L &lock)
 {
-    std::random_device rd;                      // non-deterministic generator
-    std::mt19937 gen(rd());                     // to seed mersenne twister.
-    std::uniform_int_distribution<> dist(1, 4); // distribute results between 1 and 4 inclusive.
+    std::random_device rd;                            // non-deterministic generator
+    std::mt19937 gen(rd());                           // to seed mersenne twister.
+    std::uniform_int_distribution<> dist(1000, 4000); // distribute between 1000 and 4000 inclusive.
     auto start = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < state.range(); i++)
     {
         lock.acquire();
         lock.release();
         auto started_spinning = std::chrono::high_resolution_clock::now();
-        std::chrono::microseconds time_to_wait{dist(gen)};
+        std::chrono::nanoseconds time_to_wait{dist(gen)};
         auto spin_until = started_spinning + time_to_wait;
         while (std::chrono::high_resolution_clock::now() < spin_until)
             ;
@@ -103,14 +103,14 @@ std::chrono::duration<double> warb(benchmark::State &state, L &lock)
 template <class L>
 std::chrono::duration<double> wb(benchmark::State &state, L &lock)
 {
-    std::random_device rd;                      // non-deterministic generator
-    std::mt19937 gen(rd());                     // to seed mersenne twister.
-    std::uniform_int_distribution<> dist(1, 4); // distribute results between 1 and 4 inclusive.
+    std::random_device rd;                            // non-deterministic generator
+    std::mt19937 gen(rd());                           // to seed mersenne twister.
+    std::uniform_int_distribution<> dist(1000, 4000); // distribute between 1000 and 4000 inclusive.
     auto start = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < state.range(); i++)
     {
         auto started_spinning = std::chrono::high_resolution_clock::now();
-        std::chrono::microseconds time_to_wait{dist(gen)};
+        std::chrono::nanoseconds time_to_wait{dist(gen)};
         auto spin_until = started_spinning + time_to_wait;
         while (std::chrono::high_resolution_clock::now() < spin_until)
             ;
