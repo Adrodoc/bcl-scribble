@@ -63,6 +63,9 @@ public:
         auto predecessor = BCL::fetch_and_op(tail, my_node, BCL::replace<BCL::GlobalPtr<mcs_node>>());
         log() << "predecessor=" << predecessor << std::endl;
 
+        log() << "flushing" << std::endl;
+        BCL::flush();
+
         bool first = predecessor == nullptr;
         if (!first)
         {
@@ -109,6 +112,10 @@ public:
             auto null = BCL::null<mcs_node>();
             auto cas = BCL::compare_and_swap(tail, my_node, null);
             log() << "cas(" << tail << ", " << my_node << ", " << null << ") = " << cas << std::endl;
+
+            log() << "flushing" << std::endl;
+            BCL::flush();
+
             if (cas == my_node)
             {
                 log() << "no successor" << std::endl;
