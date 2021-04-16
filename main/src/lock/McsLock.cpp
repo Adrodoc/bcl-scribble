@@ -63,8 +63,8 @@ public:
         auto predecessor = BCL::fetch_and_op(tail, my_node, BCL::replace<BCL::GlobalPtr<mcs_node>>());
         log() << "predecessor=" << predecessor << std::endl;
 
-        log() << "flushing" << std::endl;
-        BCL::flush();
+        // log() << "flushing" << std::endl;
+        // BCL::flush();
 
         bool first = predecessor == nullptr;
         if (!first)
@@ -83,8 +83,8 @@ public:
             BCL::atomic_rput(my_node, predecessor_next);
             //     predecessor->next = my_node;
 
-            log() << "flushing" << std::endl;
-            BCL::flush();
+            // log() << "flushing" << std::endl;
+            // BCL::flush();
 
             log() << "notified predecessor" << std::endl;
 
@@ -117,8 +117,8 @@ public:
             auto cas = BCL::compare_and_swap(tail, my_node, null);
             log() << "cas(" << tail << ", " << my_node << ", " << null << ") = " << cas << std::endl;
 
-            log() << "flushing" << std::endl;
-            BCL::flush();
+            // log() << "flushing" << std::endl;
+            // BCL::flush();
 
             if (cas == my_node)
             {
@@ -141,8 +141,8 @@ public:
         BCL::atomic_rput(false, successor_locked);
         // successor->locked = false;
 
-        log() << "flushing" << std::endl;
-        BCL::flush();
+        // log() << "flushing" << std::endl;
+        // BCL::flush();
 
         log() << "lock released" << std::endl;
         return false;
