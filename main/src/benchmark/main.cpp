@@ -6,8 +6,8 @@
 // #include "lock/McsLockMpiFlushLocal.cpp"
 // #include "lock/McsLockMpiFlushLocalAll.cpp"
 // #include "lock/McsLockMpiRequest.cpp"
-// #include "lock/TasLock.cpp"
-// #include "lock/TtsLock.cpp"
+#include "lock/TasLock.cpp"
+#include "lock/TtsLock.cpp"
 #include "log.cpp"
 
 void print_processor()
@@ -34,8 +34,8 @@ int main(int argc, char *argv[])
   // REGISTER_LOCK_BENCHMARKS(McsLockMpiFlushLocal);
   // REGISTER_LOCK_BENCHMARKS(McsLockMpiFlushLocalAll);
   // REGISTER_LOCK_BENCHMARKS(McsLockMpiRequest);
-  // REGISTER_LOCK_BENCHMARKS(TasLock);
-  // REGISTER_LOCK_BENCHMARKS(TtsLock);
+  REGISTER_LOCK_BENCHMARKS(TasLock);
+  REGISTER_LOCK_BENCHMARKS(TtsLock);
 
   benchmark::Initialize(&argc, argv);
   if (BCL::rank() == 0)
