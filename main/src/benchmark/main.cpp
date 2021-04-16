@@ -24,6 +24,7 @@ extern std::string FLAGS_benchmark_out;
 int main(int argc, char *argv[])
 {
   BCL::init();
+  freopen(("err/" + std::to_string(BCL::rank()) + ".err").c_str(), "w", stderr);
 
   print_processor();
   MPI_Barrier(MPI_COMM_WORLD);
