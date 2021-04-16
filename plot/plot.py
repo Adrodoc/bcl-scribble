@@ -23,9 +23,14 @@ for commit_path in reports_dir.iterdir():
     commit = commit_path.name
     json_dir = commit_path / 'json'
     png_dir = commit_path / 'png'
-    png_dir.mkdir(exist_ok=True)
+    if png_dir.is_dir():
+        print('Skipping '+commit)
+        continue
+    print('Plotting '+commit)
 
     data = pd.concat([read_benchmark_json(p) for p in json_dir.iterdir()])
+
+    png_dir.mkdir(exist_ok=True)
 
     raw = data[data['run_type'] == 'iteration']
     for (scenario, df) in raw.groupby('scenario'):
