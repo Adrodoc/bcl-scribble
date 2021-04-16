@@ -19,6 +19,8 @@ void print_processor()
             << processor_name << std::endl;
 }
 
+extern std::string FLAGS_benchmark_out;
+
 int main(int argc, char *argv[])
 {
   BCL::init();
@@ -40,8 +42,10 @@ int main(int argc, char *argv[])
     benchmark::RunSpecifiedBenchmarks();
   else
   {
+    // Removing this command line flag to avoid recreating the file when it is already in use.
+    FLAGS_benchmark_out = "";
     NullReporter null;
-    benchmark::RunSpecifiedBenchmarks(&null, &null);
+    benchmark::RunSpecifiedBenchmarks(&null);
   }
   BCL::finalize();
   return 0;
