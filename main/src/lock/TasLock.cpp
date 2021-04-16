@@ -29,10 +29,11 @@ public:
     void acquire()
     {
         while (BCL::fetch_and_op(flag, (uint8_t)1, BCL::replace<uint8_t>()))
-            ;
+            BCL::flush();
     }
     void release()
     {
         BCL::fetch_and_op(flag, (uint8_t)0, BCL::replace<uint8_t>());
+        BCL::flush();
     }
 };
