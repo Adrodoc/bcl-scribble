@@ -28,7 +28,11 @@ for commit_path in reports_dir.iterdir():
         continue
     print('Plotting '+commit)
 
-    data = pd.concat([read_benchmark_json(p) for p in json_dir.iterdir()])
+    data = pd.concat([
+        read_benchmark_json(p)
+        for p in json_dir.iterdir()
+        if p.suffix == '.json'
+    ])
 
     png_dir.mkdir(exist_ok=True)
 
