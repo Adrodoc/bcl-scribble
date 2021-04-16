@@ -89,8 +89,9 @@ public:
             log() << "notified predecessor" << std::endl;
 
             while (BCL::atomic_rget(my_node_locked))
-                // log() << "waiting to acquire lock" << std::endl;
-                ;
+                BCL::flush();
+            // log() << "waiting to acquire lock" << std::endl;
+            ;
             //     while (my_node.local()->locked)
             //         ;
         }
