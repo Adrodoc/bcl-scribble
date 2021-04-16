@@ -83,6 +83,9 @@ public:
             BCL::atomic_rput(my_node, predecessor_next);
             //     predecessor->next = my_node;
 
+            log() << "flushing" << std::endl;
+            BCL::flush();
+
             log() << "notified predecessor" << std::endl;
 
             while (BCL::atomic_rget(my_node_locked))
@@ -135,6 +138,10 @@ public:
         auto successor_locked = BCL::struct_field<bool>(successor, offsetof(mcs_node, locked));
         BCL::atomic_rput(false, successor_locked);
         // successor->locked = false;
+
+        log() << "flushing" << std::endl;
+        BCL::flush();
+
         log() << "lock released" << std::endl;
         return false;
     }
