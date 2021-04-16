@@ -8,6 +8,7 @@
 // #include "lock/McsLockMpiRequest.cpp"
 // #include "lock/TasLock.cpp"
 #include "lock/TtsLock.cpp"
+#include "log.cpp"
 
 void print_processor()
 {
@@ -15,8 +16,7 @@ void print_processor()
   int processor_name_len;
   MPI_Get_processor_name(processor_name_array, &processor_name_len);
   std::string processor_name = std::string{processor_name_array, (std::size_t)processor_name_len};
-  std::cout << "(" << BCL::rank() << "/" << BCL::nprocs() << "): Running on processor: "
-            << processor_name << std::endl;
+  log() << "Running on processor: " << processor_name << std::endl;
 }
 
 extern std::string FLAGS_benchmark_out;

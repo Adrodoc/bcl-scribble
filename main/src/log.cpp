@@ -33,7 +33,7 @@ std::string formatted_time()
 
 std::ostream &log()
 {
-    return std::cout << formatted_time() << " (" << BCL::rank() << "/" << BCL::nprocs() << "): ";
+    return std::clog << formatted_time() << " (" << BCL::rank() << "/" << BCL::nprocs() << "): ";
 }
 
 template <typename T>
