@@ -10,6 +10,26 @@
 #include "lock/TtsLock.cpp"
 #include "log.cpp"
 
+std::string get_mpi_memory_model()
+{
+  int *memory_model;
+  int flag;
+  MPI_Win_get_attr(BCL::win, MPI_WIN_MODEL, &memory_model, &flag);
+  if (!flag)
+  {
+    return "UNKNOWN";
+  }
+  switch (*memory_model)
+  {
+  case MPI_WIN_SEPARATE:
+    return "MPI_WIN_SEPARATE";
+  case MPI_WIN_UNIFIED:
+    return "MPI_WIN_UNIFIED";
+  default:
+    return "UNKNOWN";
+  }
+}
+
 void print_processor()
 {
   char processor_name_array[MPI_MAX_PROCESSOR_NAME];
@@ -24,7 +44,8 @@ extern std::string FLAGS_benchmark_out;
 int main(int argc, char *argv[])
 {
   BCL::init();
-
+  if (BCL::rank() == 0)
+    log() << "MPI memory model: " << get_mpi_memory_model() << std::endl;
   print_processor();
   MPI_Barrier(MPI_COMM_WORLD);
 
