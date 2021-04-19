@@ -34,7 +34,7 @@ public:
     {
         while ((BCL::atomic_rget(flag) & LOCKED_BIT) ||                                 // test LOCKED_BIT
                (BCL::fetch_and_op(flag, LOCKED_BIT, BCL::bor<uint8_t>()) & LOCKED_BIT)) // test and set LOCKED_BIT
-            ;
+            BCL::flush();
     }
     void release()
     {

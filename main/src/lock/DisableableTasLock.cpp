@@ -33,7 +33,7 @@ public:
     void acquire()
     {
         while (BCL::fetch_and_op(flag, LOCKED_BIT, BCL::bor<uint8_t>()) & LOCKED_BIT)
-            ;
+            BCL::flush();
     }
     void release()
     {
