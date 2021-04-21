@@ -14,8 +14,8 @@ private:
     };
     BCL::GlobalPtr<BCL::GlobalPtr<mcs_node>> tail;
     BCL::GlobalPtr<mcs_node> my_node;
-    int first_acquire = 0;
-    int not_first_acquire = 0;
+    int acquire_immediate_count = 0;
+    int acquire_queued_count = 0;
 
 public:
     McsLock(const McsLock &) = delete;
@@ -55,8 +55,8 @@ public:
     {
         using namespace benchmark;
         UserCounters counters;
-        counters["first_acquire"] = Counter(first_acquire);
-        counters["total_acquire"] = Counter(first_acquire + not_first_acquire);
+        counters["acquire_immediate_count"] = Counter(acquire_immediate_count);
+        counters["acquire_count"] = Counter(acquire_immediate_count + acquire_queued_count);
         return counters;
     }
 
@@ -105,11 +105,11 @@ public:
             ;
             //     while (my_node.local()->locked)
             //         ;
-            not_first_acquire += 1;
+            acquire_queued_count++;
         }
         else
         {
-            first_acquire += 1;
+            acquire_immediate_count++;
         }
         // log() << "lock acquired" << std::endl;
         return first;
