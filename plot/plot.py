@@ -47,6 +47,7 @@ for commit_path in reports_dir.iterdir():
             hue='lock', style='lock', markers=True, dashes=False,
         )
         plot.set(
+            ylim=0,
             # yscale='log',
             ylabel='median throughput in million locks/s\nwith 95% confidence interval',
             xticks=df['mpi_processes'].drop_duplicates(),
