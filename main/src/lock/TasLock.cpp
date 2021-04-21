@@ -7,8 +7,10 @@ class TasLock : public Lock
 {
 private:
     BCL::GlobalPtr<uint8_t> flag;
+#ifdef STATS
     int spin_count = 0;
     int acquire_count = 0;
+#endif
 
 public:
     TasLock(const uint64_t rank = 0)
@@ -29,6 +31,7 @@ public:
         }
     }
 
+#ifdef STATS
     benchmark::UserCounters counters()
     {
         using namespace benchmark;
@@ -37,14 +40,19 @@ public:
         counters["acquire_count"] = Counter(acquire_count);
         return counters;
     }
+#endif
 
     void acquire()
     {
+#ifdef STATS
         acquire_count++;
+#endif
         while (BCL::fetch_and_op(flag, (uint8_t)1, BCL::replace<uint8_t>()))
         {
             BCL::flush();
+#ifdef STATS
             spin_count++;
+#endif
         }
     }
     void release()

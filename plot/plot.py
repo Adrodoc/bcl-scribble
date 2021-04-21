@@ -53,28 +53,28 @@ for commit_path in reports_dir.iterdir():
             xticks=df['mpi_processes'].drop_duplicates(),
         )
 
-        if 'acquire_immediate_count' in df.columns:
-            ax2 = plot.twinx()
-            df['acquire_immediate_proportion'] = \
-                df['acquire_immediate_count'] / df['acquire_count']
-            sns.lineplot(
-                ax=ax2,
-                data=df,
-                x='mpi_processes', y='acquire_immediate_proportion',
-                color='b',
-            )
-            ax2.set(ylim=(0, 1))
+        # if 'acquire_immediate_count' in df.columns:
+        #     ax2 = plot.twinx()
+        #     df['acquire_immediate_proportion'] = \
+        #         df['acquire_immediate_count'] / df['acquire_count']
+        #     sns.lineplot(
+        #         ax=ax2,
+        #         data=df,
+        #         x='mpi_processes', y='acquire_immediate_proportion',
+        #         color='b',
+        #     )
+        #     ax2.set(ylim=(0, 1))
 
-        if 'spin_count' in df.columns:
-            ax2 = plot.twinx()
-            df['spin_proportion'] = df['spin_count'] / df['acquire_count']
-            sns.lineplot(
-                ax=ax2,
-                data=df,
-                x='mpi_processes', y='spin_proportion',
-                color='r',
-            )
-            ax2.set(ylim=0)
+        # if 'spin_count' in df.columns:
+        #     ax2 = plot.twinx()
+        #     df['spin_proportion'] = df['spin_count'] / df['acquire_count']
+        #     sns.lineplot(
+        #         ax=ax2,
+        #         data=df,
+        #         x='mpi_processes', y='spin_proportion',
+        #         color='r',
+        #     )
+        #     ax2.set(ylim=0)
 
         fig = plot.get_figure()
         fig.savefig(png_dir / (scenario+'.png'))
