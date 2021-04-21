@@ -27,9 +27,9 @@ std::chrono::duration<double> ecsb(benchmark::State &state, L &lock)
 template <class L>
 std::chrono::duration<double> sob(benchmark::State &state, L &lock)
 {
-    std::random_device rd;  // non-deterministic generator
-    std::mt19937 gen(rd()); // to seed mersenne twister.
-    std::uniform_int_distribution<> dist(100, 400);
+    std::random_device rd;                            // non-deterministic generator
+    std::mt19937 gen(rd());                           // to seed mersenne twister.
+    std::uniform_int_distribution<> dist(1000, 4000); // distribute between 1000 and 4000 inclusive.
     auto counter = BCL::alloc_shared<int>(1);
     auto start = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < state.range(); i++)
@@ -44,15 +44,15 @@ std::chrono::duration<double> sob(benchmark::State &state, L &lock)
 
 /*
  * The workload-critical-section benchmark (WCSB) covers variable workloads in the CS: each process
- * increments a shared counter and then spins for a random time (100-400μs) to simulate local
+ * increments a shared counter and then spins for a random time (1-4μs) to simulate local
  * computation.
  */
 template <class L>
 std::chrono::duration<double> wcsb(benchmark::State &state, L &lock)
 {
-    std::random_device rd;  // non-deterministic generator
-    std::mt19937 gen(rd()); // to seed mersenne twister.
-    std::uniform_int_distribution<> dist(100, 400);
+    std::random_device rd;                            // non-deterministic generator
+    std::mt19937 gen(rd());                           // to seed mersenne twister.
+    std::uniform_int_distribution<> dist(1000, 4000); // distribute between 1000 and 4000 inclusive.
     auto counter = BCL::alloc_shared<int>(1);
     auto start = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < state.range(); i++)
@@ -61,7 +61,7 @@ std::chrono::duration<double> wcsb(benchmark::State &state, L &lock)
         int c = BCL::rget(counter) + 1;
         BCL::rput(c, counter);
         auto started_spinning = std::chrono::high_resolution_clock::now();
-        std::chrono::microseconds time_to_wait{dist(gen)};
+        std::chrono::nanoseconds time_to_wait{dist(gen)};
         auto spin_until = started_spinning + time_to_wait;
         while (std::chrono::high_resolution_clock::now() < spin_until)
             ;
@@ -73,21 +73,21 @@ std::chrono::duration<double> wcsb(benchmark::State &state, L &lock)
 
 /*
  * The wait-after-release benchmark (WARB) varies lock contention: after release, processes wait for
- * a random time (100-400μs) before the next acquire.
+ * a random time (1-4μs) before the next acquire.
  */
 template <class L>
 std::chrono::duration<double> warb(benchmark::State &state, L &lock)
 {
-    std::random_device rd;  // non-deterministic generator
-    std::mt19937 gen(rd()); // to seed mersenne twister.
-    std::uniform_int_distribution<> dist(100, 400);
+    std::random_device rd;                            // non-deterministic generator
+    std::mt19937 gen(rd());                           // to seed mersenne twister.
+    std::uniform_int_distribution<> dist(1000, 4000); // distribute between 1000 and 4000 inclusive.
     auto start = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < state.range(); i++)
     {
         lock.acquire();
         lock.release();
         auto started_spinning = std::chrono::high_resolution_clock::now();
-        std::chrono::microseconds time_to_wait{dist(gen)};
+        std::chrono::nanoseconds time_to_wait{dist(gen)};
         auto spin_until = started_spinning + time_to_wait;
         while (std::chrono::high_resolution_clock::now() < spin_until)
             ;
