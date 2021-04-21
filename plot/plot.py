@@ -53,6 +53,17 @@ for commit_path in reports_dir.iterdir():
             xticks=df['mpi_processes'].drop_duplicates(),
         )
 
+        if 'first_acquire' in df.columns:
+            ax2 = plot.twinx()
+            df['first_acquire_part'] = df['first_acquire'] / df['total_acquire']
+            sns.lineplot(
+                ax=ax2,
+                data=df,
+                x='mpi_processes', y='first_acquire_part',
+                color='r',
+            )
+            ax2.set(ylim=(0, 1))
+
         fig = plot.get_figure()
         fig.savefig(png_dir / (scenario+'.png'))
         fig.clf()

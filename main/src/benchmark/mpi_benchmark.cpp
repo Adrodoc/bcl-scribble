@@ -8,6 +8,8 @@ void mpi_lock_benchmark(
     mpi_lock_benchmark_with_supplier(state, benchmark, std::make_unique<L>);
 }
 
+void Increment(benchmark::UserCounters *l, benchmark::UserCounters const &r);
+
 template <class L>
 void mpi_lock_benchmark_with_supplier(
     benchmark::State &state,
@@ -27,6 +29,7 @@ void mpi_lock_benchmark_with_supplier(
         double max_elapsed_second;
         MPI_Allreduce(&elapsed_seconds, &max_elapsed_second, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
         state.SetIterationTime(max_elapsed_second);
+        Increment(&state.counters, lock->counters());
     }
     int size;
     MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -34,4 +37,26 @@ void mpi_lock_benchmark_with_supplier(
     using Counter = benchmark::Counter;
     state.counters["critical_sections"] = Counter(critical_sections, Counter::kIsRate);
     state.SetLabel("{\"mpi_processes\":" + std::to_string(size) + "}");
+}
+
+void Increment(benchmark::UserCounters *l, benchmark::UserCounters const &r)
+{
+    // add counters present in both or just in *l
+    for (auto &c : *l)
+    {
+        auto it = r.find(c.first);
+        if (it != r.end())
+        {
+            c.second.value = c.second + it->second;
+        }
+    }
+    // add counters present in r, but not in *l
+    for (auto const &tc : r)
+    {
+        auto it = l->find(tc.first);
+        if (it == l->end())
+        {
+            (*l)[tc.first] = tc.second;
+        }
+    }
 }
