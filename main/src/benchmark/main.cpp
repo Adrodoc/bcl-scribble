@@ -2,6 +2,7 @@
 #include "benchmarks.cpp"
 // #include "lock/DisableableTasLock.cpp"
 // #include "lock/DisableableTtsLock.cpp"
+#include "lock/DMcsLock.cpp"
 // #include "lock/HybridLock.cpp"
 #include "lock/McsLock.cpp"
 // #include "lock/McsLockFlushEveryOperation.cpp"
@@ -53,6 +54,7 @@ int main(int argc, char *argv[])
 
   // REGISTER_LOCK_BENCHMARKS(DisableableTasLock);
   // REGISTER_LOCK_BENCHMARKS(DisableableTtsLock);
+  REGISTER_LOCK_BENCHMARKS(DMcsLock);
   // REGISTER_LOCK_BENCHMARKS(HybridLock);
   REGISTER_LOCK_BENCHMARKS(McsLock);
   // REGISTER_LOCK_BENCHMARKS(McsLockFlushEveryOperation);
