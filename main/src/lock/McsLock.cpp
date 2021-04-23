@@ -71,6 +71,10 @@ public:
     // Returns true if we acquired the lock immediately, because were the first one in the queue right away.
     bool acquire_ext()
     {
+        auto my_node_locked = BCL::struct_field<bool>(my_node, offsetof(mcs_node, locked));
+        // log() << "locking my_node at " << my_node << std::endl;
+        BCL::atomic_rput(true, my_node_locked);
+
         auto my_node_next = BCL::struct_field<BCL::GlobalPtr<mcs_node>>(my_node, offsetof(mcs_node, next));
         BCL::atomic_rput(BCL::null<mcs_node>(), my_node_next);
         // log() << "entering acquire()" << std::endl;
@@ -79,18 +83,13 @@ public:
         // log() << "predecessor=" << predecessor << std::endl;
 
         // log() << "flushing" << std::endl;
-        // BCL::flush();
+        BCL::flush();
 
         bool first = predecessor == nullptr;
         if (!first)
         {
-            auto my_node_locked = BCL::struct_field<bool>(my_node, offsetof(mcs_node, locked));
-            // log() << "locking my_node at " << my_node << std::endl;
-            BCL::atomic_rput(true, my_node_locked);
-            //     my_node.local()->locked = true;
-
             // log() << "flushing" << std::endl;
-            BCL::flush();
+            // BCL::flush();
 
             auto predecessor_next = BCL::struct_field<BCL::GlobalPtr<mcs_node>>(predecessor, offsetof(mcs_node, next));
             // log() << "notifying predecessor at " << predecessor_next << std::endl;
@@ -117,7 +116,7 @@ public:
             acquire_immediate_count++;
 #endif
         }
-        // log() << "lock acquired" << std::endl;
+        // log() << "exiting acquire()" << std::endl;
         return first;
     }
 
@@ -140,7 +139,7 @@ public:
             // log() << "cas(" << tail << ", " << my_node << ", " << null << ") = " << cas << std::endl;
 
             // log() << "flushing" << std::endl;
-            // BCL::flush();
+            BCL::flush();
 
             if (cas == my_node)
             {
@@ -149,13 +148,13 @@ public:
                 return true;
             }
             // log() << "waiting for successor at " << my_node_next << std::endl;
-        }
-        while (successor == nullptr)
-        {
-            BCL::flush();
-            successor = BCL::atomic_rget(my_node_next);
-            //     successor = my_node.local()->next;
-            // log() << "waiting for successor at " << my_node_next << std::endl;
+            do
+            {
+                BCL::flush();
+                successor = BCL::atomic_rget(my_node_next);
+                //     successor = my_node.local()->next;
+                // log() << "waiting for successor at " << my_node_next << std::endl;
+            } while (successor == nullptr);
         }
         // log() << "found successor=" << successor << std::endl;
 
@@ -166,7 +165,7 @@ public:
         // log() << "flushing" << std::endl;
         // BCL::flush();
 
-        // log() << "lock released" << std::endl;
+        // log() << "exiting release()" << std::endl;
         return false;
     }
 };
