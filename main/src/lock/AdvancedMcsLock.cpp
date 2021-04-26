@@ -10,14 +10,13 @@ private:
         blocked = 1,
         lockTail = 2
     };
-    MPI_Comm comm;
     int rank;
     MPI_Win win;
     int *lmem;
 
 public:
     AdvancedMcsLock(const AdvancedMcsLock &) = delete;
-    AdvancedMcsLock(MPI_Comm comm = MPI_COMM_WORLD) : comm{comm}
+    AdvancedMcsLock(MPI_Comm comm = MPI_COMM_WORLD)
     {
         MPI_Comm_rank(comm, &rank);
         MPI_Aint winsize = 2 * sizeof(int);
@@ -26,13 +25,12 @@ public:
         MPI_Win_allocate(winsize, sizeof(int), MPI_INFO_NULL, comm, &lmem, &win);
         if (rank == 0)
             lmem[lockTail] = -1;
+        MPI_Win_fence(0, win);
         MPI_Win_lock_all(0, win);
-        MPI_Barrier(comm);
     }
 
     ~AdvancedMcsLock()
     {
-        MPI_Barrier(comm);
         MPI_Win_unlock_all(win);
         MPI_Win_free(&win);
     }
