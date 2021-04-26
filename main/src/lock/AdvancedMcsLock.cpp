@@ -75,6 +75,7 @@ public:
             int curtail;
             MPI_Compare_and_swap(&nullrank, &rank, &curtail, MPI_INT,
                                  0, lockTail, win);
+            MPI_Win_flush_local(0, win);
             if (curtail == rank)
             {
                 // We are the only process in the list
