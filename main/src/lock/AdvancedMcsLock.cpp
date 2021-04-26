@@ -26,12 +26,14 @@ public:
         MPI_Win_allocate(winsize, sizeof(int), MPI_INFO_NULL, comm, &lmem, &win);
         if (rank == 0)
             lmem[lockTail] = -1;
+        MPI_Win_lock_all(0, win);
         MPI_Barrier(comm);
     }
 
     ~AdvancedMcsLock()
     {
         MPI_Barrier(comm);
+        MPI_Win_unlock_all(win);
         MPI_Win_free(&win);
     }
 
@@ -39,7 +41,6 @@ public:
     {
         lmem[nextRank] = -1;
         lmem[blocked] = 1;
-        MPI_Win_lock_all(0, win);
         int predecessor;
         MPI_Fetch_and_op(&rank, &predecessor, MPI_INT,
                          0, lockTail, MPI_REPLACE, win);
@@ -57,12 +58,10 @@ public:
             } while (lmem[blocked] == 1);
         }
         // else we have the lock
-        MPI_Win_unlock_all(win);
     }
 
     void release()
     {
-        MPI_Win_lock_all(0, win);
         if (lmem[nextRank] == -1)
         {
             // See if we’re waiting for the next to notify us
@@ -73,7 +72,6 @@ public:
             if (curtail == rank)
             {
                 // We are the only process in the list
-                MPI_Win_unlock_all(win);
                 return;
             }
             // Otherwise, someone else has added themselves to the list.
@@ -88,6 +86,5 @@ public:
         MPI_Accumulate(&zero, 1, MPI_INT,
                        lmem[nextRank], blocked, 1, MPI_INT,
                        MPI_REPLACE, win);
-        MPI_Win_unlock_all(win);
     }
 };
