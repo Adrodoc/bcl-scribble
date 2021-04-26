@@ -1,5 +1,6 @@
 #include "NullReporter.cpp"
 #include "benchmarks.cpp"
+#include "lock/AdvancedMcsLock.cpp"
 // #include "lock/DisableableTasLock.cpp"
 // #include "lock/DisableableTtsLock.cpp"
 #include "lock/DMcsLock.cpp"
@@ -9,7 +10,7 @@
 // #include "lock/McsLockMpiFlushLocal.cpp"
 // #include "lock/McsLockMpiFlushLocalAll.cpp"
 // #include "lock/McsLockMpiRequest.cpp"
-#include "lock/TasLock.cpp"
+// #include "lock/TasLock.cpp"
 // #include "lock/TtsLock.cpp"
 #include "log.cpp"
 
@@ -52,6 +53,7 @@ int main(int argc, char *argv[])
   print_processor();
   MPI_Barrier(MPI_COMM_WORLD);
 
+  REGISTER_LOCK_BENCHMARKS(AdvancedMcsLock);
   // REGISTER_LOCK_BENCHMARKS(DisableableTasLock);
   // REGISTER_LOCK_BENCHMARKS(DisableableTtsLock);
   REGISTER_LOCK_BENCHMARKS(DMcsLock);
@@ -61,7 +63,7 @@ int main(int argc, char *argv[])
   // REGISTER_LOCK_BENCHMARKS(McsLockMpiFlushLocal);
   // REGISTER_LOCK_BENCHMARKS(McsLockMpiFlushLocalAll);
   // REGISTER_LOCK_BENCHMARKS(McsLockMpiRequest);
-  REGISTER_LOCK_BENCHMARKS(TasLock);
+  // REGISTER_LOCK_BENCHMARKS(TasLock);
   // REGISTER_LOCK_BENCHMARKS(TtsLock);
 
   benchmark::Initialize(&argc, argv);
