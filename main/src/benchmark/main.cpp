@@ -48,6 +48,7 @@ extern std::string FLAGS_benchmark_out;
 int main(int argc, char *argv[])
 {
   BCL::init();
+  freopen(("err/" + std::to_string(BCL::rank()) + ".err").c_str(), "w", stderr);
   if (BCL::rank() == 0)
     log() << "MPI memory model: " << get_mpi_memory_model() << std::endl;
   print_processor();
