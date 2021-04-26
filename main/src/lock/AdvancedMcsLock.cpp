@@ -24,8 +24,6 @@ public:
         if (rank == 0)
             winsize += sizeof(int);
         MPI_Win_allocate(winsize, sizeof(int), MPI_INFO_NULL, comm, &lmem, &win);
-        lmem[nextRank] = -1;
-        lmem[blocked] = 0;
         if (rank == 0)
             lmem[lockTail] = -1;
         MPI_Barrier(comm);
@@ -39,7 +37,8 @@ public:
 
     void acquire()
     {
-        lmem[blocked] = 1; // In case we are blocked
+        lmem[nextRank] = -1;
+        lmem[blocked] = 1;
         MPI_Win_lock_all(0, win);
         int predecessor;
         MPI_Fetch_and_op(&rank, &predecessor, MPI_INT,
