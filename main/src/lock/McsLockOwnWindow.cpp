@@ -74,7 +74,7 @@ public:
             int locked;
             do
             {
-                MPI_Get_accumulate(0, 0, MPI_INT,
+                MPI_Get_accumulate(0, 1, MPI_INT,
                                    &locked, 1, MPI_INT,
                                    rank, locked_disp, 1, MPI_INT,
                                    MPI_NO_OP, win);
@@ -90,7 +90,7 @@ public:
         // log() << "entering release()" << std::endl;
         // MPI_Win_lock_all(0, win);
         int successor;
-        MPI_Get_accumulate(0, 0, MPI_INT,
+        MPI_Get_accumulate(0, 1, MPI_INT,
                            &successor, 1, MPI_INT,
                            rank, next_disp, 1, MPI_INT,
                            MPI_NO_OP, win);
@@ -112,7 +112,7 @@ public:
             // log() << "waiting for successor (tail=" << tail << ")" << std::endl;
             do
             {
-                MPI_Get_accumulate(0, 0, MPI_INT,
+                MPI_Get_accumulate(0, 1, MPI_INT,
                                    &successor, 1, MPI_INT,
                                    rank, next_disp, 1, MPI_INT,
                                    MPI_NO_OP, win);
