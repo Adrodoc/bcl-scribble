@@ -49,7 +49,14 @@ extern std::string FLAGS_benchmark_out;
 int main(int argc, char *argv[])
 {
   BCL::init();
-  freopen(("err/" + std::to_string(BCL::rank()) + ".err").c_str(), "w", stderr);
+  // MPI_Init(NULL, NULL);
+  // int rank;
+  // MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  // BCL::my_rank = rank;
+  // int size;
+  // MPI_Comm_size(MPI_COMM_WORLD, &size);
+  // BCL::my_nprocs = size;
+  // freopen(("err/" + std::to_string(BCL::rank()) + ".err").c_str(), "w", stderr);
   if (BCL::rank() == 0)
     log() << "MPI memory model: " << get_mpi_memory_model() << std::endl;
   print_processor();
@@ -79,6 +86,7 @@ int main(int argc, char *argv[])
     NullReporter null;
     benchmark::RunSpecifiedBenchmarks(&null);
   }
+  // MPI_Finalize();
   BCL::finalize();
   return 0;
 }
