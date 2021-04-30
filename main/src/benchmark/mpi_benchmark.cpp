@@ -16,9 +16,14 @@ void mpi_lock_benchmark_with_supplier(
     std::function<std::chrono::duration<double>(benchmark::State &, L &)> benchmark,
     std::function<std::unique_ptr<L>()> lock_supplier)
 {
+    auto lock = lock_supplier();
+
+    // warm up
+    for (int i = 0; i < 10; i++)
+        benchmark(state, *lock);
+
     for (auto _ : state)
     {
-        auto lock = lock_supplier();
         MPI_Barrier(MPI_COMM_WORLD);
         // Do the work and time it on each proc
         auto const duration = benchmark(state, *lock);
