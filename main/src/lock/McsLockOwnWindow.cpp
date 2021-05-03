@@ -70,9 +70,8 @@ public:
             // log() << "notifying predecessor: " << predecessor << std::endl;
             window.atomic_set(predecessor, next_disp, rank);
             // log() << "waiting for predecessor" << std::endl;
-            while (window.atomic_get<int>(rank, locked_disp))
-                window.flush_all();
-            ;
+            while (window.atomic_get_flush<int>(rank, locked_disp))
+                ;
         }
         // log() << "exiting acquire()" << std::endl;
     }
@@ -92,7 +91,7 @@ public:
             // log() << "waiting for successor" << std::endl;
             do
             {
-                successor = window.atomic_get<int>(rank, next_disp);
+                successor = window.atomic_get_flush<int>(rank, next_disp);
             } while (successor == -1);
         }
         // log() << "notifying successor: " << successor << std::endl;
