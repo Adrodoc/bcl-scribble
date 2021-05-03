@@ -83,7 +83,7 @@ public:
         // log() << "predecessor=" << predecessor << std::endl;
 
         // log() << "flushing" << std::endl;
-        BCL::flush();
+        // BCL::flush();
 
         bool first = predecessor == nullptr;
         if (!first)
@@ -139,7 +139,7 @@ public:
             // log() << "cas(" << tail << ", " << my_node << ", " << null << ") = " << cas << std::endl;
 
             // log() << "flushing" << std::endl;
-            BCL::flush();
+            // BCL::flush();
 
             if (cas == my_node)
             {
