@@ -40,23 +40,24 @@ public:
         MPI_Win_flush_all(win);
     }
 
-#define REQUEST_BASED
+#define USE_FAO
+#define USE_REQUEST_BASED
 
     template <typename T>
     inline T get(const int target_rank, const MPI_Aint target_disp) const
     {
         T result;
-        MPI_Datatype type = BCL::get_mpi_type<T>();
-#ifndef REQUEST_BASED
+        MPI_Datatype type = get_mpi_type<T>();
+#ifndef USE_REQUEST_BASED
         MPI_Get(&result, 1, type,
                 target_rank, target_disp, 1, type,
-                BCL::win);
-        MPI_Win_flush_local(target_rank, BCL::win);
+                win);
+        MPI_Win_flush_local(target_rank, win);
 #else
         MPI_Request request;
         MPI_Rget(&result, 1, type,
                  target_rank, target_disp, 1, type,
-                 BCL::win, &request);
+                 win, &request);
         MPI_Wait(&request, MPI_STATUS_IGNORE);
 #endif
         return result;
@@ -65,17 +66,17 @@ public:
     template <typename T>
     inline void set(const int target_rank, const MPI_Aint target_disp, const T &value) const
     {
-        MPI_Datatype type = BCL::get_mpi_type<T>();
-#ifndef REQUEST_BASED
+        MPI_Datatype type = get_mpi_type<T>();
+#ifndef USE_REQUEST_BASED
         MPI_Put(&value, 1, type,
                 target_rank, target_disp, 1, type,
-                BCL::win);
-        MPI_Win_flush_local(target_rank, BCL::win);
+                win);
+        MPI_Win_flush_local(target_rank, win);
 #else
         MPI_Request request;
         MPI_Rput(&value, 1, type,
                  target_rank, target_disp, 1, type,
-                 BCL::win, &request);
+                 win, &request);
         MPI_Wait(&request, MPI_STATUS_IGNORE);
 #endif
     }
@@ -83,23 +84,26 @@ public:
     template <typename T>
     inline T atomic_get(const int target_rank, const MPI_Aint target_disp) const
     {
-        MPI_Datatype type = BCL::get_mpi_type<T>();
+        MPI_Datatype type = get_mpi_type<T>();
         T dummy;
         T result;
-#ifndef REQUEST_BASED
+#ifndef USE_REQUEST_BASED
+#ifdef USE_FAO
         MPI_Fetch_and_op(&dummy, &result, type,
-                         target_rank, target_disp, MPI_NO_OP, BCL::win);
-        // MPI_Get_accumulate(&dummy, 1, type,
-        //                    &result, 1, type,
-        //                    target_rank, target_disp, 1, type,
-        //                    MPI_NO_OP, BCL::win);
-        MPI_Win_flush_local(target_rank, BCL::win);
+                         target_rank, target_disp, MPI_NO_OP, win);
+#else
+        MPI_Get_accumulate(&dummy, 1, type,
+                           &result, 1, type,
+                           target_rank, target_disp, 1, type,
+                           MPI_NO_OP, win);
+#endif
+        MPI_Win_flush_local(target_rank, win);
 #else
         MPI_Request request;
         MPI_Rget_accumulate(&dummy, 1, type,
                             &result, 1, type,
                             target_rank, target_disp, 1, type,
-                            MPI_NO_OP, BCL::win, &request);
+                            MPI_NO_OP, win, &request);
         MPI_Wait(&request, MPI_STATUS_IGNORE);
 #endif
         return result;
@@ -108,17 +112,17 @@ public:
     template <typename T>
     inline void atomic_set(const int target_rank, const MPI_Aint target_disp, const T &value) const
     {
-        MPI_Datatype type = BCL::get_mpi_type<T>();
-#ifndef REQUEST_BASED
-        // MPI_Accumulate(&value, 1, type,
-        //                target_rank, target_disp, 1, type,
-        //                MPI_REPLACE, BCL::win);
-        // MPI_Win_flush_local(target_rank, BCL::win);
+        MPI_Datatype type = get_mpi_type<T>();
+#ifndef USE_REQUEST_BASED
+        MPI_Accumulate(&value, 1, type,
+                       target_rank, target_disp, 1, type,
+                       MPI_REPLACE, win);
+        MPI_Win_flush_local(target_rank, win);
 #else
         MPI_Request request;
         MPI_Raccumulate(&value, 1, type,
                         target_rank, target_disp, 1, type,
-                        MPI_REPLACE, BCL::win, &request);
+                        MPI_REPLACE, win, &request);
         MPI_Wait(&request, MPI_STATUS_IGNORE);
 #endif
     }
@@ -126,22 +130,25 @@ public:
     template <typename T>
     inline T swap(const int target_rank, const MPI_Aint target_disp, const T &value) const
     {
-        MPI_Datatype type = BCL::get_mpi_type<T>();
+        MPI_Datatype type = get_mpi_type<T>();
         T result;
-#ifndef REQUEST_BASED
+#ifndef USE_REQUEST_BASED
+#ifdef USE_FAO
         MPI_Fetch_and_op(&value, &result, type,
-                         target_rank, target_disp, MPI_REPLACE, BCL::win);
-        // MPI_Get_accumulate(&value, 1, type,
-        //                    &result, 1, type,
-        //                    target_rank, target_disp, 1, type,
-        //                    MPI_REPLACE, BCL::win);
-        MPI_Win_flush_local(target_rank, BCL::win);
+                         target_rank, target_disp, MPI_REPLACE, win);
+#else
+        MPI_Get_accumulate(&value, 1, type,
+                           &result, 1, type,
+                           target_rank, target_disp, 1, type,
+                           MPI_REPLACE, win);
+#endif
+        MPI_Win_flush_local(target_rank, win);
 #else
         MPI_Request request;
         MPI_Rget_accumulate(&value, 1, type,
                             &result, 1, type,
                             target_rank, target_disp, 1, type,
-                            MPI_REPLACE, BCL::win, &request);
+                            MPI_REPLACE, win, &request);
         MPI_Wait(&request, MPI_STATUS_IGNORE);
 #endif
         return result;
@@ -150,11 +157,11 @@ public:
     template <typename T>
     inline bool compare_and_swap(const int target_rank, const MPI_Aint target_disp, const T &old_value, const T &new_value) const
     {
-        MPI_Datatype type = BCL::get_mpi_type<T>();
+        MPI_Datatype type = get_mpi_type<T>();
         T result;
         MPI_Compare_and_swap(&new_value, &old_value, &result, type,
-                             target_rank, target_disp, BCL::win);
-        MPI_Win_flush_local(target_rank, BCL::win);
+                             target_rank, target_disp, win);
+        MPI_Win_flush_local(target_rank, win);
         return result == old_value;
     }
 };
