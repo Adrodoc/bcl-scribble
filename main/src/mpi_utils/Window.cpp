@@ -7,9 +7,12 @@ class Window
 private:
     static MPI_Win allocate_win(const MPI_Aint size, const MPI_Comm comm)
     {
+        MPI_Info info;
+        MPI_Info_create(&info);
+        MPI_Info_set(info, "accumulate_ordering", "none");
         void *mem;
         MPI_Win win;
-        MPI_Win_allocate(size, 1, MPI_INFO_NULL, comm, &mem, &win);
+        MPI_Win_allocate(size, 1, info, comm, &mem, &win);
         return win;
     }
 
