@@ -19,7 +19,7 @@ void mpi_lock_benchmark_with_supplier(
     auto lock = lock_supplier();
 
     // warm up
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 5; i++)
         benchmark(state, *lock);
 
     for (auto _ : state)
