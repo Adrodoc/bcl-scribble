@@ -18,8 +18,12 @@ void mpi_lock_benchmark_with_supplier(
 {
     auto lock = lock_supplier();
 
+    int size;
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
     // warm up
-    for (int i = 0; i < 5; i++)
+    double warmup_iterations = 32.0 / size;
+    for (int i = 0; i < warmup_iterations; i++)
         benchmark(state, *lock);
 
     for (auto _ : state)
@@ -36,8 +40,6 @@ void mpi_lock_benchmark_with_supplier(
         state.SetIterationTime(max_elapsed_second);
         Increment(&state.counters, lock->counters());
     }
-    int size;
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
     int64_t critical_sections = state.iterations() * state.range() * size;
     using Counter = benchmark::Counter;
     state.counters["critical_sections"] = Counter(critical_sections, Counter::kIsRate);
