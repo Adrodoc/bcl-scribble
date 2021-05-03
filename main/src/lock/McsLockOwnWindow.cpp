@@ -60,8 +60,8 @@ public:
     void acquire()
     {
         // log() << "entering acquire()" << std::endl;
-        window.set(rank, locked_disp, 1);
-        window.set(rank, next_disp, -1);
+        window.atomic_set(rank, locked_disp, 1);
+        window.atomic_set(rank, next_disp, -1);
 
         // log() << "finding predecessor" << std::endl;
         int predecessor = window.swap(master_rank, tail_disp, rank);
