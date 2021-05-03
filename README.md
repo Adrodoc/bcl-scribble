@@ -30,18 +30,25 @@ cmake --build build --config Release
 ```
 
 # Run
-## All benchmarks
+## Locally
+### All benchmarks
 ```bash
-./run-benchmarks.sh
+./locally-run-benchmarks.sh
 ```
 
-## Locally
+### A specific configuration
 ```bash
 export OMPI_MCA_osc=pt2pt # Only needed when using Open-MPI, see https://github.com/open-mpi/ompi/issues/2080
 mpirun -n 4 build/main/main
 ```
 
 ## At LRZ
+### All benchmarks
+```bash
+./sbatch-run-benchmarks.sh
+```
+
+### A specific configuration
 ```bash
 salloc --ntasks=4 --partition=cm2_inter
 mpiexec build/main/main
