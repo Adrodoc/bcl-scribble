@@ -10,6 +10,7 @@ private:
         MPI_Info info;
         MPI_Info_create(&info);
         MPI_Info_set(info, "accumulate_ordering", "none");
+        MPI_Info_set(info, "same_disp_unit", "true");
         void *mem;
         MPI_Win win;
         MPI_Win_allocate(size, 1, info, comm, &mem, &win);
