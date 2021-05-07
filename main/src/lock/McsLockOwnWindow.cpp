@@ -39,7 +39,7 @@ public:
     McsLockOwnWindow(const MPI_Comm comm = MPI_COMM_WORLD, const int master_rank = 0)
         : master_rank{master_rank},
           rank{get_rank(comm)},
-          window{(MPI_Aint)(sizeof(bool) + sizeof(int) + (rank == master_rank ? sizeof(int) : 0)), comm}
+          window{(MPI_Aint)(sizeof(bool) + sizeof(int) + sizeof(int)), comm}
     {
         // log() << "entering McsLockOwnWindow" << std::endl;
         window.lock_all();
