@@ -19,9 +19,9 @@ private:
     // static constexpr MPI_Aint tail_disp = offsetof(memory_layout, tail);
     enum
     {
-        locked_disp = 0 * sizeof(int),
-        next_disp = 1 * sizeof(int),
-        tail_disp = 2 * sizeof(int)
+        locked_disp = 0,
+        next_disp = locked_disp + 1 * sizeof(bool),
+        tail_disp = next_disp + 1 * sizeof(int)
     };
     const int master_rank;
     const int rank;
@@ -39,7 +39,7 @@ public:
     McsLockOwnWindow(const MPI_Comm comm = MPI_COMM_WORLD, const int master_rank = 0)
         : master_rank{master_rank},
           rank{get_rank(comm)},
-          window{(MPI_Aint)((rank == master_rank ? 3 : 2) * sizeof(int)), comm}
+          window{(MPI_Aint)(sizeof(bool) + sizeof(int) + (rank == master_rank ? sizeof(int) : 0)), comm}
     {
         // log() << "entering McsLockOwnWindow" << std::endl;
         window.lock_all();
@@ -60,7 +60,7 @@ public:
     void acquire()
     {
         // log() << "entering acquire()" << std::endl;
-        window.atomic_set(rank, locked_disp, 1);
+        window.atomic_set(rank, locked_disp, true);
         window.atomic_set(rank, next_disp, -1);
 
         // log() << "finding predecessor" << std::endl;
@@ -70,7 +70,7 @@ public:
             // log() << "notifying predecessor: " << predecessor << std::endl;
             window.atomic_set(predecessor, next_disp, rank);
             // log() << "waiting for predecessor" << std::endl;
-            while (window.atomic_get_flush<int>(rank, locked_disp))
+            while (window.atomic_get_flush<bool>(rank, locked_disp))
                 ;
         }
         // log() << "exiting acquire()" << std::endl;
@@ -95,7 +95,7 @@ public:
             } while (successor == -1);
         }
         // log() << "notifying successor: " << successor << std::endl;
-        window.atomic_set(successor, locked_disp, 0);
+        window.atomic_set(successor, locked_disp, false);
         // log() << "exiting release()" << std::endl;
     }
 };
