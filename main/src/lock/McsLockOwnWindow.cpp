@@ -70,8 +70,8 @@ public:
             // log() << "notifying predecessor: " << predecessor << std::endl;
             window.atomic_set(predecessor, next_disp, rank);
             // log() << "waiting for predecessor" << std::endl;
-            while (window.atomic_get_flush<bool>(rank, locked_disp))
-                ;
+            while (window.atomic_get<bool>(rank, locked_disp))
+                MPI_Win_flush_all(window.win);
         }
         // log() << "exiting acquire()" << std::endl;
     }
@@ -91,7 +91,8 @@ public:
             // log() << "waiting for successor" << std::endl;
             do
             {
-                successor = window.atomic_get_flush<int>(rank, next_disp);
+                MPI_Win_flush_all(window.win);
+                successor = window.atomic_get<int>(rank, next_disp);
             } while (successor == -1);
         }
         // log() << "notifying successor: " << successor << std::endl;
