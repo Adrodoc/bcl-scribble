@@ -20,8 +20,8 @@ private:
     enum
     {
         locked_disp = 0,
-        next_disp = locked_disp + 1 * sizeof(bool),
-        tail_disp = next_disp + 1 * sizeof(int)
+        next_disp = 128,
+        tail_disp = 128 * 2
     };
     const int master_rank;
     const int rank;
@@ -39,7 +39,7 @@ public:
     McsLockOwnWindow(const MPI_Comm comm = MPI_COMM_WORLD, const int master_rank = 0)
         : master_rank{master_rank},
           rank{get_rank(comm)},
-          window{(MPI_Aint)(sizeof(bool) + sizeof(int) + sizeof(int)), comm}
+          window{(MPI_Aint)(128 * 3), comm}
     {
         // log() << "entering McsLockOwnWindow" << std::endl;
         window.lock_all();
