@@ -91,8 +91,8 @@ public:
             // log() << "waiting for successor" << std::endl;
             do
             {
-                MPI_Win_flush_all(window.win);
                 successor = window.atomic_get<int>(rank, next_disp);
+                MPI_Win_flush_all(window.win);
             } while (successor == -1);
         }
         // log() << "notifying successor: " << successor << std::endl;
