@@ -115,35 +115,6 @@ public:
     }
 
     template <typename T>
-    inline T atomic_get_flush(const int target_rank, const MPI_Aint target_disp) const
-    {
-        MPI_Datatype type = get_mpi_type<T>();
-        T dummy;
-        T result;
-#ifndef USE_REQUEST_BASED
-#ifdef USE_FAO
-        MPI_Fetch_and_op(&dummy, &result, type,
-                         target_rank, target_disp, MPI_NO_OP, win);
-#else
-        MPI_Get_accumulate(&dummy, 1, type,
-                           &result, 1, type,
-                           target_rank, target_disp, 1, type,
-                           MPI_NO_OP, win);
-#endif
-        MPI_Win_flush(target_rank, win);
-#else
-        MPI_Request request;
-        MPI_Rget_accumulate(&dummy, 1, type,
-                            &result, 1, type,
-                            target_rank, target_disp, 1, type,
-                            MPI_NO_OP, win, &request);
-        MPI_Wait(&request, MPI_STATUS_IGNORE);
-        MPI_Win_flush(target_rank, win);
-#endif
-        return result;
-    }
-
-    template <typename T>
     inline void atomic_set(const int target_rank, const MPI_Aint target_disp, const T &value) const
     {
         MPI_Datatype type = get_mpi_type<T>();
