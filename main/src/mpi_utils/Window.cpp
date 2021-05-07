@@ -46,7 +46,7 @@ public:
     }
 
 #define USE_FAO
-#define USE_REQUEST_BASED
+    //#define USE_REQUEST_BASED
 
     template <typename T>
     inline T get(const int target_rank, const MPI_Aint target_disp) const
