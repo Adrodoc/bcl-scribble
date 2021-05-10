@@ -17,11 +17,12 @@ private:
     // static constexpr MPI_Aint locked_disp = offsetof(memory_layout, locked);
     // static constexpr MPI_Aint next_disp = offsetof(memory_layout, next);
     // static constexpr MPI_Aint tail_disp = offsetof(memory_layout, tail);
+    static constexpr MPI_Aint PADDING = 64;
     enum
     {
-        locked_disp = 0,
-        next_disp = 128,
-        tail_disp = 128 * 2
+        locked_disp = 0 * PADDING,
+        next_disp = 1 * PADDING,
+        tail_disp = 2 * PADDING,
     };
     const int master_rank;
     const int rank;
@@ -39,7 +40,7 @@ public:
     McsLockOwnWindow(const MPI_Comm comm = MPI_COMM_WORLD, const int master_rank = 0)
         : master_rank{master_rank},
           rank{get_rank(comm)},
-          window{(MPI_Aint)(128 * 3), comm}
+          window{(MPI_Aint)(3 * PADDING), comm}
     {
         // log() << "entering McsLockOwnWindow" << std::endl;
         window.lock_all();
