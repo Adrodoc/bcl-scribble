@@ -12,6 +12,7 @@
 #include "lock/McsLockMpiRequest.cpp"
 #include "lock/McsLockOwnWindow.cpp"
 #include "lock/MyShuffleLock.cpp"
+#include "lock/ShflLock.cpp"
 #include "lock/TasLock.cpp"
 #include "lock/TtsLock.cpp"
 #include "log.cpp"
@@ -75,6 +76,7 @@ int main(int argc, char *argv[])
     // REGISTER_LOCK_BENCHMARKS(McsLockMpiRequest);
     REGISTER_LOCK_BENCHMARKS(McsLockOwnWindow);
     REGISTER_LOCK_BENCHMARKS(MyShuffleLock);
+    REGISTER_LOCK_BENCHMARKS(ShflLock);
     // REGISTER_LOCK_BENCHMARKS(TasLock);
     // REGISTER_LOCK_BENCHMARKS(TtsLock);
 
