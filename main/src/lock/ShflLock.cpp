@@ -8,9 +8,9 @@
 class ShflLock : public Lock
 {
 private:
-    static inline constexpr uint8_t S_WAITING = 0; // Waiting on the node status
-    static inline constexpr uint8_t S_READY = 1;   // The waiter is at the head of the queue
-    static inline constexpr int MAX_SHUFFLES = 1024;
+    static constexpr uint8_t S_WAITING = 0; // Waiting on the node status
+    static constexpr uint8_t S_READY = 1;   // The waiter is at the head of the queue
+    static constexpr int MAX_SHUFFLES = 1024;
 
     static constexpr MPI_Aint PADDING = 64;
     enum

@@ -8,10 +8,10 @@
 class MyShuffleLock : public Lock
 {
 private:
-    static inline constexpr char LOCKED = 0;
-    static inline constexpr char WAITING_FOR_LOCK = 1;
-    static inline constexpr char SHUFFLING = 2;
-    static inline constexpr char WAITING_FOR_SHUFFLE = 3;
+    static constexpr char LOCKED = 0;
+    static constexpr char WAITING_FOR_LOCK = 1;
+    static constexpr char SHUFFLING = 2;
+    static constexpr char WAITING_FOR_SHUFFLE = 3;
     static constexpr MPI_Aint PADDING = 64;
     enum
     {
