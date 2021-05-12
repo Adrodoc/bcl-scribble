@@ -3,6 +3,7 @@
 #include <mpi.h>
 #include "Lock.cpp"
 #include "log.cpp"
+#include "mpi_utils/mpi_utils.cpp"
 #include "mpi_utils/Window.cpp"
 
 class ShflLock : public Lock
@@ -31,13 +32,6 @@ private:
     const int master_rank;
     const int rank;
     const Window window;
-
-    static int get_rank(const MPI_Comm comm)
-    {
-        int rank;
-        MPI_Comm_rank(comm, &rank);
-        return rank;
-    }
 
 public:
     ShflLock(const ShflLock &) = delete;
