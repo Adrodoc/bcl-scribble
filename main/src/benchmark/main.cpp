@@ -78,15 +78,15 @@ int main(int argc, char *argv[])
     // REGISTER_LOCK_BENCHMARKS(McsLockMpiFlushLocal);
     // REGISTER_LOCK_BENCHMARKS(McsLockMpiFlushLocalAll);
     // REGISTER_LOCK_BENCHMARKS(McsLockMpiRequest);
-    // REGISTER_LOCK_BENCHMARKS(McsLockOwnWindow);
+    REGISTER_LOCK_BENCHMARKS(McsLockOwnWindow);
     // REGISTER_LOCK_BENCHMARKS(MyShuffleLock);
-    // REGISTER_LOCK_BENCHMARKS(ShflLock);
-    REGISTER_LOCK_BENCHMARKS(TasLock);
-    REGISTER_LOCK_BENCHMARKS(TasLockOwnWindow);
+    REGISTER_LOCK_BENCHMARKS(ShflLock);
+    // REGISTER_LOCK_BENCHMARKS(TasLock);
+    // REGISTER_LOCK_BENCHMARKS(TasLockOwnWindow);
     REGISTER_LOCK_BENCHMARKS(TasLockOwnWindowCas);
-    REGISTER_LOCK_BENCHMARKS(TtsLock);
-    REGISTER_LOCK_BENCHMARKS(TtsLockOwnWindow);
-    REGISTER_LOCK_BENCHMARKS(TtsLockOwnWindowCas);
+    // REGISTER_LOCK_BENCHMARKS(TtsLock);
+    // REGISTER_LOCK_BENCHMARKS(TtsLockOwnWindow);
+    // REGISTER_LOCK_BENCHMARKS(TtsLockOwnWindowCas);
 
     benchmark::Initialize(&argc, argv);
     if (BCL::rank() == 0)

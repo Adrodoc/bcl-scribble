@@ -31,6 +31,7 @@ private:
     };
     const int master_rank;
     const int rank;
+    const int node_id;
     const Window window;
 
 public:
@@ -38,6 +39,7 @@ public:
     ShflLock(const MPI_Comm comm = MPI_COMM_WORLD, const int master_rank = 0)
         : master_rank{master_rank},
           rank{get_rank(comm)},
+          node_id{get_node_id(comm)},
           window{(MPI_Aint)((rank == master_rank ? 8 : 6) * PADDING), comm}
     {
         window.lock_all();
@@ -67,7 +69,7 @@ public:
         window.set(rank, batch_disp, 0);
         window.set(rank, is_shuffler_disp, false);
         window.set(rank, next_disp, -1);
-        window.set(rank, skt_disp, 0);
+        window.set(rank, skt_disp, node_id);
 
         int qprev = window.swap(master_rank, tail_disp, rank); // Atomically adding to the queue tail
 
