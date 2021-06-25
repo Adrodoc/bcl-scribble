@@ -65,7 +65,7 @@ public:
             /* Now spin on our local value "blocked" until we are given the lock. */
             do
             {
-                MPI_Win_sync(win);
+                MPI_Win_flush_all(win);
             } while (lmem[blocked] == 1);
         }
     }
@@ -97,7 +97,7 @@ public:
             /* Otherwise, someone else has added themselves to the list. */
             do
             {
-                MPI_Win_sync(win);
+                MPI_Win_flush_all(win);
             } while (lmem[nextRank] == -1);
         }
 

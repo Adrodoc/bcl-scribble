@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
     // REGISTER_LOCK_BENCHMARKS(AdvancedMcsLock);
     // REGISTER_LOCK_BENCHMARKS(DisableableTasLock);
     // REGISTER_LOCK_BENCHMARKS(DisableableTtsLock);
-    // REGISTER_LOCK_BENCHMARKS(DMcsLock);
+    REGISTER_LOCK_BENCHMARKS(DMcsLock);
     REGISTER_LOCK_BENCHMARKS(HMCSLock);
     // REGISTER_LOCK_BENCHMARKS(HybridLock);
     // REGISTER_LOCK_BENCHMARKS(McsLock);
