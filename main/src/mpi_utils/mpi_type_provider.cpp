@@ -1,7 +1,10 @@
 #pragma once
 
 #include <mpi.h>
+
+#ifdef COMPLEX
 #include <complex>
+#endif
 
 // Datatypes from
 // MPI: A Message-Passing Interface Standard Version 3.1 (https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf)
@@ -189,6 +192,7 @@ struct mpi_type_provider<bool>
     static constexpr MPI_Datatype mpi_type = MPI_CXX_BOOL;
 };
 
+#ifdef COMPLEX
 template <>
 struct mpi_type_provider<std::complex<float>>
 {
@@ -206,6 +210,7 @@ struct mpi_type_provider<std::complex<long double>>
 {
     static constexpr MPI_Datatype mpi_type = MPI_CXX_LONG_DOUBLE_COMPLEX;
 };
+#endif
 
 template <typename T>
 MPI_Datatype get_mpi_type()
