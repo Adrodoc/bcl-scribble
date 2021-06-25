@@ -30,6 +30,7 @@ class HMCSLock : public Lock
     };
 
 public:
+    HMCSLock(const HMCSLock &) = delete;
     /* Initialization of window for a MCS-queue */
     HMCSLock()
     {
