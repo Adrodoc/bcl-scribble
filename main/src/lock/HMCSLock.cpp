@@ -1,9 +1,11 @@
 #pragma once
 
+#include <inttypes.h>
 #include <mpi.h>
 #include "Lock.cpp"
 
 #define HMCS_THRESHOLD 50
+#define PRINT
 
 class HMCSLock : public Lock
 {
