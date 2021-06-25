@@ -111,7 +111,7 @@ public:
             /* Now spin on our local value "status" until we are given the lock. */
             do
             {
-                MPI_Win_sync(local_win);
+                MPI_Win_flush_all(local_win);
             } while ((status = local_mem[STATUS]) == WAIT);
             if (status != ACQUIRE_GLOBAL)
             {
@@ -237,7 +237,7 @@ public:
 #endif
             do
             {
-                MPI_Win_sync(local_win);
+                MPI_Win_flush_all(local_win);
             } while ((local_successor = local_mem[NEXT]) == -1);
         }
 
