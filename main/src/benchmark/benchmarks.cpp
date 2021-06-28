@@ -131,5 +131,6 @@ void registerLockBenchmark(const std::string name, std::function<std::chrono::du
 
 #define REGISTER_LOCK_BENCHMARKS(L)   \
     REGISTER_LOCK_BENCHMARK(ecsb, L); \
+    REGISTER_LOCK_BENCHMARK(sob, L);  \
     REGISTER_LOCK_BENCHMARK(wcsb, L); \
     REGISTER_LOCK_BENCHMARK(warb, L);
