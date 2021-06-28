@@ -11,4 +11,4 @@ module load slurm_setup
 
 json_dir=reports/$commit-lrz-$partition/json
 mkdir -p $json_dir
-mpiexec -n $SLURM_NTASKS build/main/main --benchmark_repetitions=16 --benchmark_out=$json_dir/lrz-$partition-$nodes-$ntasks-per-node-$SLURM_NTASKS.json
+mpiexec -n $SLURM_NTASKS build/main/main --benchmark_repetitions=16 --benchmark_out=$json_dir/lrz-$partition-$nodes-$ntasks-per-node-$SLURM_NTASKS.json --benchmark_display_aggregates_only=true
