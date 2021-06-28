@@ -12,6 +12,7 @@
 #include "lock/McsLockMpiFlushLocalAll.cpp"
 #include "lock/McsLockMpiRequest.cpp"
 #include "lock/McsLockOwnWindow.cpp"
+#include "lock/MpiWinLock.cpp"
 #include "lock/MyShuffleLock.cpp"
 #include "lock/ShflLock.cpp"
 #include "lock/TasLock.cpp"
@@ -72,8 +73,8 @@ int main(int argc, char *argv[])
     // REGISTER_LOCK_BENCHMARKS(AdvancedMcsLock);
     // REGISTER_LOCK_BENCHMARKS(DisableableTasLock);
     // REGISTER_LOCK_BENCHMARKS(DisableableTtsLock);
-    REGISTER_LOCK_BENCHMARKS(DMcsLock);
-    REGISTER_LOCK_BENCHMARKS(HMCSLock);
+    // REGISTER_LOCK_BENCHMARKS(DMcsLock);
+    // REGISTER_LOCK_BENCHMARKS(HMCSLock);
     // REGISTER_LOCK_BENCHMARKS(HybridLock);
     // REGISTER_LOCK_BENCHMARKS(McsLock);
     // REGISTER_LOCK_BENCHMARKS(McsLockFlushEveryOperation);
@@ -81,6 +82,7 @@ int main(int argc, char *argv[])
     // REGISTER_LOCK_BENCHMARKS(McsLockMpiFlushLocalAll);
     // REGISTER_LOCK_BENCHMARKS(McsLockMpiRequest);
     REGISTER_LOCK_BENCHMARKS(McsLockOwnWindow);
+    REGISTER_LOCK_BENCHMARKS(MpiWinLock);
     // REGISTER_LOCK_BENCHMARKS(MyShuffleLock);
     // REGISTER_LOCK_BENCHMARKS(ShflLock);
     // REGISTER_LOCK_BENCHMARKS(TasLock);
