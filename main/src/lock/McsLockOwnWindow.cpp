@@ -28,6 +28,7 @@ private:
     const int master_rank;
     const int rank;
     const Window window;
+    int *lmem;
 
 public:
     McsLockOwnWindow(const McsLockOwnWindow &) = delete;
@@ -37,6 +38,8 @@ public:
           window{(MPI_Aint)((rank == master_rank ? 3 : 2) * PADDING), comm}
     {
         // log() << "entering McsLockOwnWindow" << std::endl;
+        int flag;
+        MPI_Win_get_attr(window.win, MPI_WIN_BASE, &lmem, &flag);
         window.lock_all();
         if (rank == master_rank)
             window.set(rank, tail_disp, -1);
@@ -55,8 +58,9 @@ public:
     void acquire()
     {
         // log() << "entering acquire()" << std::endl;
-        window.atomic_set(rank, locked_disp, true);
-        window.atomic_set(rank, next_disp, -1);
+        lmem[locked_disp / sizeof(int)] = 1;
+        lmem[next_disp / sizeof(int)] = -1;
+        MPI_Win_sync(window.win);
 
         // log() << "finding predecessor" << std::endl;
         int predecessor = window.swap(master_rank, tail_disp, rank);
@@ -65,7 +69,7 @@ public:
             // log() << "notifying predecessor: " << predecessor << std::endl;
             window.atomic_set(predecessor, next_disp, rank);
             // log() << "waiting for predecessor" << std::endl;
-            while (window.atomic_get<bool>(rank, locked_disp))
+            while (lmem[locked_disp / sizeof(int)])
                 window.flush_all();
         }
         // log() << "exiting acquire()" << std::endl;
@@ -74,7 +78,7 @@ public:
     void release()
     {
         // log() << "entering release()" << std::endl;
-        int successor = window.atomic_get<int>(rank, next_disp);
+        int successor = lmem[next_disp / sizeof(int)];
         if (successor == -1)
         {
             // log() << "nulling tail" << std::endl;
@@ -84,11 +88,11 @@ public:
                 return;
             }
             // log() << "waiting for successor" << std::endl;
-            while ((successor = window.atomic_get<int>(rank, next_disp)) == -1)
+            while ((successor = lmem[next_disp / sizeof(int)]) == -1)
                 window.flush_all();
         }
         // log() << "notifying successor: " << successor << std::endl;
-        window.atomic_set(successor, locked_disp, false);
+        window.atomic_set(successor, locked_disp, 0);
         // log() << "exiting release()" << std::endl;
     }
 };
