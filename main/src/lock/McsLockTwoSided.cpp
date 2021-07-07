@@ -87,7 +87,7 @@ public:
         }
         // log() << "notifying successor: " << successor << std::endl;
         // window.atomic_set(successor, locked_disp, 0);
-        MPI_Send(0, 0, MPI_UINT8_T, successor, 0, comm);
+        MPI_Ssend(0, 0, MPI_UINT8_T, successor, 0, comm);
         // log() << "exiting release()" << std::endl;
     }
 };
