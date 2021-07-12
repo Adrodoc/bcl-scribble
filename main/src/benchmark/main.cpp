@@ -1,6 +1,8 @@
+#include <libdash.h>
 #include "NullReporter.cpp"
 #include "benchmarks.cpp"
 #include "lock/AdvancedMcsLock.cpp"
+#include "lock/DashLock.cpp"
 #include "lock/DMcsLock.cpp"
 #include "lock/DisableableTasLock.cpp"
 #include "lock/DisableableTtsLock.cpp"
@@ -57,6 +59,7 @@ extern std::string FLAGS_benchmark_out;
 
 int main(int argc, char *argv[])
 {
+    dash::init(&argc, &argv);
     BCL::init();
     // MPI_Init(NULL, NULL);
     // int rank;
@@ -72,6 +75,7 @@ int main(int argc, char *argv[])
     MPI_Barrier(MPI_COMM_WORLD);
 
     // REGISTER_LOCK_BENCHMARKS(AdvancedMcsLock);
+    REGISTER_LOCK_BENCHMARKS(DashLock);
     // REGISTER_LOCK_BENCHMARKS(DisableableTasLock);
     // REGISTER_LOCK_BENCHMARKS(DisableableTtsLock);
     // REGISTER_LOCK_BENCHMARKS(DMcsLock);
@@ -82,7 +86,7 @@ int main(int argc, char *argv[])
     // REGISTER_LOCK_BENCHMARKS(McsLockMpiFlushLocal);
     // REGISTER_LOCK_BENCHMARKS(McsLockMpiFlushLocalAll);
     // REGISTER_LOCK_BENCHMARKS(McsLockMpiRequest);
-    REGISTER_LOCK_BENCHMARKS(McsLockOwnWindow);
+    // REGISTER_LOCK_BENCHMARKS(McsLockOwnWindow);
     REGISTER_LOCK_BENCHMARKS(McsLockTwoSided);
     // REGISTER_LOCK_BENCHMARKS(MpiWinLock);
     // REGISTER_LOCK_BENCHMARKS(MyShuffleLock);
@@ -106,5 +110,6 @@ int main(int argc, char *argv[])
     }
     // MPI_Finalize();
     BCL::finalize();
+    dash::finalize();
     return 0;
 }
