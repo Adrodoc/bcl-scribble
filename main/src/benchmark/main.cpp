@@ -9,6 +9,7 @@
 #include "lock/McsLock.cpp"
 #include "lock/McsLockBcl.cpp"
 #include "lock/McsLockFlushEveryOperation.cpp"
+#include "lock/McsLockFlushLocal.cpp"
 #include "lock/McsLockMpiFlushLocal.cpp"
 #include "lock/McsLockMpiFlushLocalAll.cpp"
 #include "lock/McsLockMpiRequest.cpp"
@@ -81,6 +82,7 @@ int main(int argc, char *argv[])
     REGISTER_LOCK_BENCHMARKS(McsLock);
     // REGISTER_LOCK_BENCHMARKS(McsLockBcl);
     // REGISTER_LOCK_BENCHMARKS(McsLockFlushEveryOperation);
+    REGISTER_LOCK_BENCHMARKS(McsLockFlushLocal);
     // REGISTER_LOCK_BENCHMARKS(McsLockMpiFlushLocal);
     // REGISTER_LOCK_BENCHMARKS(McsLockMpiFlushLocalAll);
     // REGISTER_LOCK_BENCHMARKS(McsLockMpiRequest);
