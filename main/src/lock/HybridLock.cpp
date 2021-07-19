@@ -3,13 +3,13 @@
 #include <bcl_ext/bcl.hpp>
 #include "Lock.cpp"
 #include "DisableableTasLock.cpp"
-#include "McsLock.cpp"
+#include "McsLockBcl.cpp"
 
 class HybridLock : public Lock
 {
 private:
     DisableableTasLock tas_lock;
-    McsLock mcs_lock;
+    McsLockBcl mcs_lock;
 
 public:
     HybridLock(const HybridLock &) = delete;

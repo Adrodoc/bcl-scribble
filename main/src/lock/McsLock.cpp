@@ -1,171 +1,113 @@
 #pragma once
 
-#include <bcl_ext/bcl.hpp>
+#include <mpi.h>
+#include <new>
 #include "Lock.cpp"
 #include "log.cpp"
+#include "mpi_utils/mpi_utils.cpp"
+#include "mpi_utils/Window.cpp"
 
 class McsLock : public Lock
 {
 private:
-    struct mcs_node
+    struct memory_layout
     {
-        BCL::GlobalPtr<mcs_node> next;
-        bool locked;
+        alignas(64) bool locked;
+        alignas(64) int next;
+        alignas(64) int tail;
     };
-    BCL::GlobalPtr<BCL::GlobalPtr<mcs_node>> tail;
-    BCL::GlobalPtr<mcs_node> my_node;
-#ifdef STATS
-    int acquire_immediate_count = 0;
-    int acquire_queued_count = 0;
-#endif
+    static constexpr MPI_Aint locked_disp = offsetof(memory_layout, locked);
+    static constexpr MPI_Aint next_disp = offsetof(memory_layout, next);
+    static constexpr MPI_Aint tail_disp = offsetof(memory_layout, tail);
+
+    const int master_rank;
+    const int rank;
+    memory_layout *mem;
+    MPI_Win win;
 
 public:
     McsLock(const McsLock &) = delete;
-    McsLock(const uint64_t rank = 0)
+    McsLock(const MPI_Comm comm = MPI_COMM_WORLD, const int master_rank = 0)
+        : master_rank{master_rank},
+          rank{get_rank(comm)}
     {
         // log() << "entering McsLock" << std::endl;
-        if (BCL::rank() == rank)
-        {
-            tail = BCL::alloc<BCL::GlobalPtr<mcs_node>>(1);
-            *tail = nullptr;
-        }
-        tail = BCL::broadcast(tail, rank);
+        MPI_Info info;
+        MPI_Info_create(&info);
+        MPI_Info_set(info, "accumulate_ordering", "none");
+        MPI_Info_set(info, "same_disp_unit", "true");
+        MPI_Info_set(info, "same_size", "true");
+        MPI_Win_allocate(sizeof(memory_layout), 1, info, comm, &mem, &win);
 
-        my_node = BCL::alloc<mcs_node>(1);
-        // my_node.local()->next = BCL::GlobalPtr<mcs_node>(nullptr);
-        // mcs_node n = {BCL::GlobalPtr<mcs_node>(nullptr), false};
-        // BCL::write(&n, my_node, 1);
+        if (rank == master_rank)
+            mem->tail = -1;
 
-        // log() << "tail=" << tail << std::endl;
-        // log() << "my_node=" << my_node << std::endl;
+        MPI_Win_lock_all(0, win);
+        MPI_Barrier(comm);
         // log() << "exiting McsLock" << std::endl;
     }
 
     ~McsLock()
     {
         // log() << "entering ~McsLock" << std::endl;
-        BCL::barrier();
-        if (tail.is_local())
-        {
-            BCL::dealloc(tail);
-        }
-        BCL::dealloc(my_node);
+        MPI_Win_unlock_all(win);
         // log() << "exiting ~McsLock" << std::endl;
     }
 
-#ifdef STATS
-    benchmark::UserCounters counters()
-    {
-        using namespace benchmark;
-        UserCounters counters;
-        counters["acquire_immediate_count"] = Counter(acquire_immediate_count);
-        counters["acquire_count"] = Counter(acquire_immediate_count + acquire_queued_count);
-        return counters;
-    }
-#endif
-
     void acquire()
     {
-        acquire_ext();
-    }
-    // Returns true if we acquired the lock immediately, because were the first one in the queue right away.
-    bool acquire_ext()
-    {
-        auto my_node_locked = BCL::struct_field<bool>(my_node, offsetof(mcs_node, locked));
-        // log() << "locking my_node at " << my_node << std::endl;
-        BCL::atomic_rput(true, my_node_locked);
-
-        auto my_node_next = BCL::struct_field<BCL::GlobalPtr<mcs_node>>(my_node, offsetof(mcs_node, next));
-        BCL::atomic_rput(BCL::null<mcs_node>(), my_node_next);
         // log() << "entering acquire()" << std::endl;
-        // log() << "my_node=" << my_node << std::endl;
-        auto predecessor = BCL::fetch_and_op(tail, my_node, BCL::replace<BCL::GlobalPtr<mcs_node>>());
-        // log() << "predecessor=" << predecessor << std::endl;
+        mem->locked = true;
+        mem->next = -1;
+        MPI_Win_sync(win);
 
-        // log() << "flushing" << std::endl;
-        // BCL::flush();
-
-        bool first = predecessor == nullptr;
-        if (!first)
+        // log() << "finding predecessor" << std::endl;
+        int predecessor;
+        MPI_Fetch_and_op(&rank, &predecessor, MPI_INT,
+                         master_rank, tail_disp, MPI_REPLACE, win);
+        MPI_Win_flush_local(master_rank, win);
+        if (predecessor != -1)
         {
-            // log() << "flushing" << std::endl;
-            // BCL::flush();
+            // log() << "notifying predecessor: " << predecessor << std::endl;
+            MPI_Put(&rank, 1, MPI_INT,
+                    predecessor, next_disp, 1, MPI_INT,
+                    win);
+            MPI_Win_flush_local(predecessor, win);
 
-            auto predecessor_next = BCL::struct_field<BCL::GlobalPtr<mcs_node>>(predecessor, offsetof(mcs_node, next));
-            // log() << "notifying predecessor at " << predecessor_next << std::endl;
-
-            BCL::atomic_rput(my_node, predecessor_next);
-            //     predecessor->next = my_node;
-
-            // log() << "flushing" << std::endl;
-            // BCL::flush();
-
-            // log() << "notified predecessor" << std::endl;
-
-            while (BCL::atomic_rget(my_node_locked))
-                BCL::flush();
-            // log() << "waiting to acquire lock" << std::endl;
-            ;
-            //     while (my_node.local()->locked)
-            //         ;
-#ifdef STATS
-            acquire_queued_count++;
-        }
-        else
-        {
-            acquire_immediate_count++;
-#endif
+            // log() << "waiting for predecessor" << std::endl;
+            while (mem->locked)
+                MPI_Win_flush_local(predecessor, win);
         }
         // log() << "exiting acquire()" << std::endl;
-        return first;
     }
 
     void release()
     {
-        release_ext();
-    }
-    // Returns true if we were the last one in the queue. By now someone might have entered the queue again though.
-    bool release_ext()
-    {
         // log() << "entering release()" << std::endl;
-        auto my_node_next = BCL::struct_field<BCL::GlobalPtr<mcs_node>>(my_node, offsetof(mcs_node, next));
-        auto successor = BCL::atomic_rget(my_node_next);
-        // auto successor = my_node.local()->next;
-        // log() << "successor=" << successor << std::endl;
-        if (successor == nullptr)
+        int successor = mem->next;
+        if (successor == -1)
         {
-            auto null = BCL::null<mcs_node>();
-            auto cas = BCL::compare_and_swap(tail, my_node, null);
-            // log() << "cas(" << tail << ", " << my_node << ", " << null << ") = " << cas << std::endl;
-
-            // log() << "flushing" << std::endl;
-            // BCL::flush();
-
-            if (cas == my_node)
+            // log() << "nulling tail" << std::endl;
+            int null_rank = -1;
+            int old_value;
+            MPI_Compare_and_swap(&null_rank, &rank, &old_value, MPI_INT,
+                                 master_rank, tail_disp, win);
+            MPI_Win_flush_local(master_rank, win);
+            if (old_value == rank)
             {
-                // log() << "no successor" << std::endl;
-                // log() << "lock released" << std::endl;
-                return true;
+                // log() << "exiting release()" << std::endl;
+                return;
             }
-            // log() << "waiting for successor at " << my_node_next << std::endl;
-            do
-            {
-                BCL::flush();
-                successor = BCL::atomic_rget(my_node_next);
-                //     successor = my_node.local()->next;
-                // log() << "waiting for successor at " << my_node_next << std::endl;
-            } while (successor == nullptr);
+            // log() << "waiting for successor" << std::endl;
+            while ((successor = mem->next) == -1)
+                MPI_Win_flush_local(rank, win);
         }
-        // log() << "found successor=" << successor << std::endl;
-
-        auto successor_locked = BCL::struct_field<bool>(successor, offsetof(mcs_node, locked));
-        BCL::atomic_rput(false, successor_locked);
-        // successor->locked = false;
-
-        // log() << "flushing" << std::endl;
-        // BCL::flush();
-
+        // log() << "notifying successor: " << successor << std::endl;
+        bool false_ = false;
+        MPI_Put(&false_, 1, MPI_CXX_BOOL,
+                successor, locked_disp, 1, MPI_CXX_BOOL,
+                win);
+        MPI_Win_flush_local(successor, win);
         // log() << "exiting release()" << std::endl;
-        return false;
     }
 };

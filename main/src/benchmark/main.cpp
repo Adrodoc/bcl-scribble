@@ -7,6 +7,7 @@
 #include "lock/HMCSLock.cpp"
 #include "lock/HybridLock.cpp"
 #include "lock/McsLock.cpp"
+#include "lock/McsLockBcl.cpp"
 #include "lock/McsLockFlushEveryOperation.cpp"
 #include "lock/McsLockMpiFlushLocal.cpp"
 #include "lock/McsLockMpiFlushLocalAll.cpp"
@@ -77,13 +78,14 @@ int main(int argc, char *argv[])
     // REGISTER_LOCK_BENCHMARKS(DMcsLock);
     // REGISTER_LOCK_BENCHMARKS(HMCSLock);
     // REGISTER_LOCK_BENCHMARKS(HybridLock);
-    // REGISTER_LOCK_BENCHMARKS(McsLock);
+    REGISTER_LOCK_BENCHMARKS(McsLock);
+    // REGISTER_LOCK_BENCHMARKS(McsLockBcl);
     // REGISTER_LOCK_BENCHMARKS(McsLockFlushEveryOperation);
     // REGISTER_LOCK_BENCHMARKS(McsLockMpiFlushLocal);
     // REGISTER_LOCK_BENCHMARKS(McsLockMpiFlushLocalAll);
     // REGISTER_LOCK_BENCHMARKS(McsLockMpiRequest);
     REGISTER_LOCK_BENCHMARKS(McsLockOwnWindow);
-    REGISTER_LOCK_BENCHMARKS(McsLockTwoSided);
+    // REGISTER_LOCK_BENCHMARKS(McsLockTwoSided);
     // REGISTER_LOCK_BENCHMARKS(MpiWinLock);
     // REGISTER_LOCK_BENCHMARKS(MyShuffleLock);
     // REGISTER_LOCK_BENCHMARKS(ShflLock);
