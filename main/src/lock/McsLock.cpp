@@ -65,18 +65,18 @@ public:
         int predecessor;
         MPI_Fetch_and_op(&rank, &predecessor, MPI_INT,
                          master_rank, tail_disp, MPI_REPLACE, win);
-        MPI_Win_flush_local(master_rank, win);
+        MPI_Win_flush(master_rank, win);
         if (predecessor != -1)
         {
             // log() << "notifying predecessor: " << predecessor << std::endl;
             MPI_Put(&rank, 1, MPI_INT,
                     predecessor, next_disp, 1, MPI_INT,
                     win);
-            MPI_Win_flush_local(predecessor, win);
+            MPI_Win_flush(predecessor, win);
 
             // log() << "waiting for predecessor" << std::endl;
             while (mem->locked)
-                MPI_Win_flush_local(predecessor, win);
+                MPI_Win_flush(rank, win);
         }
         // log() << "exiting acquire()" << std::endl;
     }
@@ -92,7 +92,7 @@ public:
             int old_value;
             MPI_Compare_and_swap(&null_rank, &rank, &old_value, MPI_INT,
                                  master_rank, tail_disp, win);
-            MPI_Win_flush_local(master_rank, win);
+            MPI_Win_flush(master_rank, win);
             if (old_value == rank)
             {
                 // log() << "exiting release()" << std::endl;
@@ -100,14 +100,14 @@ public:
             }
             // log() << "waiting for successor" << std::endl;
             while ((successor = mem->next) == -1)
-                MPI_Win_flush_local(rank, win);
+                MPI_Win_flush(rank, win);
         }
         // log() << "notifying successor: " << successor << std::endl;
         bool false_ = false;
         MPI_Put(&false_, 1, MPI_CXX_BOOL,
                 successor, locked_disp, 1, MPI_CXX_BOOL,
                 win);
-        MPI_Win_flush_local(successor, win);
+        MPI_Win_flush(successor, win);
         // log() << "exiting release()" << std::endl;
     }
 };
